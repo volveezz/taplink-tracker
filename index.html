@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LinkDrop</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -270,9 +270,10 @@ input, select { font: inherit; color: inherit; }
 }
 .link-config-icon svg { width: 18px; height: 18px; fill: #888; }
 .link-config-name {
-  flex: 1;
   font-size: 14px;
   font-weight: 500;
+  flex: 1;
+  min-width: 0;
 }
 .link-url-input {
   width: 100%;
@@ -287,6 +288,52 @@ input, select { font: inherit; color: inherit; }
   transition: all 0.2s ease;
 }
 .link-url-input:focus { outline: none; border-color: rgba(255,255,255,0.15); color: #d0d0d0; }
+
+/* 3-state selector */
+.state-btns {
+  display: flex;
+  gap: 2px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px;
+  padding: 2px;
+  flex-shrink: 0;
+}
+.state-btn {
+  padding: 3px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  color: #555;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.state-btn:hover { color: #999; }
+.state-btn.active { background: rgba(255,255,255,0.1); color: #ddd; }
+
+/* Disabled reason input */
+.link-reason-input {
+  width: 100%;
+  margin-top: 6px;
+  padding: 7px 10px;
+  background: rgba(255,180,50,0.04);
+  border: 1px solid rgba(255,180,50,0.12);
+  border-radius: 8px;
+  color: #bba060;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+.link-reason-input:focus { outline: none; border-color: rgba(255,180,50,0.25); }
+.link-reason-input::placeholder { color: #665530; }
+
+/* Contact form toggles */
+.contact-config { display: flex; flex-direction: column; gap: 12px; }
+.contact-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.contact-toggle-row .toggle { flex-shrink: 0; }
+.contact-toggle-label { font-size: 14px; font-weight: 500; }
 
 /* Toggle switch */
 .toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
@@ -421,10 +468,133 @@ input, select { font: inherit; color: inherit; }
   transition: all 0.3s ease;
 }
 
-/* Entry animation — delays set via JS inline style for dynamic link ordering */
+/* Entry animation — delays set via JS inline style */
 .link-item { animation: linkEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
-
 .profile-section { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+
+/* Disabled link state */
+.link-item.is-disabled {
+  opacity: 0.3;
+  cursor: default;
+  filter: grayscale(0.4);
+  pointer-events: auto;
+}
+.link-item.is-disabled:hover { opacity: 0.45; }
+.link-item.is-disabled[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: rgba(0,0,0,0.9);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 400;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+.link-item.is-disabled:hover[data-tooltip]::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ============================================
+   7b. CONTACT FORM
+   ============================================ */
+.contact-section {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s backwards;
+}
+.contact-divider {
+  width: 32px;
+  height: 1px;
+  background: var(--text-secondary, rgba(255,255,255,0.2));
+  margin: 8px auto;
+  opacity: 0.4;
+}
+.contact-title {
+  font-family: var(--font-body, 'Outfit');
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 2px;
+  letter-spacing: 0.03em;
+}
+.contact-input {
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--link-bg, rgba(255,255,255,0.06));
+  border: var(--link-border, 1px solid rgba(255,255,255,0.1));
+  border-radius: var(--link-radius, 12px);
+  box-shadow: var(--link-shadow, none);
+  color: var(--text-primary, #fff);
+  font-family: var(--font-body, 'Outfit');
+  font-size: 15px;
+  transition: all 0.3s ease;
+  outline: none;
+}
+.contact-input::placeholder {
+  color: var(--text-secondary, rgba(255,255,255,0.4));
+  opacity: 0.6;
+}
+.contact-input:focus {
+  border-color: var(--accent, rgba(255,255,255,0.3));
+}
+.contact-submit {
+  width: 100%;
+  padding: 14px;
+  background: var(--accent, #7c5bf5);
+  color: #fff;
+  border: none;
+  border-radius: var(--link-radius, 12px);
+  font-family: var(--font-body, 'Outfit');
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.02em;
+}
+.contact-submit:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.contact-submit:active { transform: translateY(1px); filter: brightness(0.95); }
+.contact-submitted {
+  text-align: center;
+  color: var(--accent, #5bd97a);
+  padding: 14px;
+  font-size: 15px;
+  font-family: var(--font-body, 'Outfit');
+  font-weight: 500;
+  animation: fadeSlideUp 0.4s ease;
+}
+
+/* Toast notification */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: rgba(0,0,0,0.88);
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: 'Outfit', sans-serif;
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 9999;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* ============================================
    8. DESIGN 1 — BRUTALIST
@@ -434,6 +604,7 @@ body.design-1 {
   --font-body: 'Space Mono', monospace;
   --text-primary: #000;
   --text-secondary: #333;
+  --accent: #FF2D6B;
   --link-bg: #fff;
   --link-text: #000;
   --link-border: 3px solid #000;
@@ -460,11 +631,11 @@ body.design-1 .profile-bio {
   font-size: 13px;
   letter-spacing: 0.01em;
 }
-body.design-1 .link-item:hover {
+body.design-1 .link-item:not(.is-disabled):hover {
   transform: translate(-3px, -3px);
   box-shadow: 8px 8px 0 #000;
 }
-body.design-1 .link-item:active {
+body.design-1 .link-item:not(.is-disabled):active {
   transform: translate(2px, 2px);
   box-shadow: 2px 2px 0 #000;
 }
@@ -476,13 +647,32 @@ body.design-1 .link-item-label {
 }
 body.design-1 .link-item-arrow { font-weight: 700; }
 body.design-1 .links-section { gap: 10px; }
+body.design-1 .contact-input {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+body.design-1 .contact-input::placeholder { text-transform: uppercase; }
+body.design-1 .contact-submit {
+  background: #FF2D6B;
+  font-family: 'Archivo Black', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 3px solid #000;
+  border-radius: 0;
+  box-shadow: 4px 4px 0 #000;
+}
+body.design-1 .contact-submit:hover { box-shadow: 6px 6px 0 #000; transform: translate(-2px, -2px); filter: none; }
+body.design-1 .contact-submit:active { box-shadow: 1px 1px 0 #000; transform: translate(2px, 2px); }
 
 /* Brutalist dark */
 body.design-1.dark #preview { background: #111; }
 body.design-1.dark { --text-primary: #FFE600; --text-secondary: #ccc; --link-bg: #1a1a1a; --link-text: #FFE600; --link-border: 3px solid #FFE600; --link-shadow: 5px 5px 0 #FFE600; }
 body.design-1.dark .avatar { background: #FF2D6B; border-color: #FFE600; box-shadow: 4px 4px 0 #FFE600; }
-body.design-1.dark .link-item:hover { box-shadow: 8px 8px 0 #FFE600; }
-body.design-1.dark .link-item:active { box-shadow: 2px 2px 0 #FFE600; }
+body.design-1.dark .link-item:not(.is-disabled):hover { box-shadow: 8px 8px 0 #FFE600; }
+body.design-1.dark .link-item:not(.is-disabled):active { box-shadow: 2px 2px 0 #FFE600; }
+body.design-1.dark .contact-submit { border-color: #FFE600; box-shadow: 4px 4px 0 #FFE600; }
+body.design-1.dark .contact-submit:hover { box-shadow: 6px 6px 0 #FFE600; }
 
 /* ============================================
    9. DESIGN 2 — AURORA
@@ -492,6 +682,7 @@ body.design-2 {
   --font-body: 'Outfit', sans-serif;
   --text-primary: #fff;
   --text-secondary: rgba(255,255,255,0.65);
+  --accent: #7c5bf5;
   --link-bg: rgba(255,255,255,0.07);
   --link-text: #fff;
   --link-border: 1px solid rgba(255,255,255,0.1);
@@ -499,9 +690,7 @@ body.design-2 {
   --link-shadow: none;
   --avatar-size: 92px;
 }
-body.design-2 #preview {
-  background: #070720;
-}
+body.design-2 #preview { background: #070720; }
 body.design-2 #preview::before {
   content: '';
   position: absolute;
@@ -530,13 +719,20 @@ body.design-2 .link-item {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
-body.design-2 .link-item:hover {
+body.design-2 .link-item:not(.is-disabled):hover {
   background: rgba(255,255,255,0.12);
   border-color: rgba(255,255,255,0.2);
   transform: translateY(-2px);
   box-shadow: 0 8px 32px rgba(120,80,255,0.15);
 }
 body.design-2 .link-item-arrow { opacity: 0.3; }
+body.design-2 .contact-input {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+body.design-2 .contact-submit {
+  background: linear-gradient(135deg, #7c5bf5, #00c9c9);
+}
 
 /* Aurora light */
 body.design-2.light #preview { background: #f0ecf8; }
@@ -549,7 +745,8 @@ body.design-2.light #preview::before {
 body.design-2.light { --text-primary: #1a1030; --text-secondary: #6b5e80; --link-bg: rgba(255,255,255,0.6); --link-text: #1a1030; --link-border: 1px solid rgba(100,60,200,0.12); }
 body.design-2.light .avatar { background: linear-gradient(135deg, rgba(120,80,255,0.2), rgba(0,200,200,0.15)); border-color: rgba(100,60,200,0.2); color: #3a2060; }
 body.design-2.light .link-item { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-body.design-2.light .link-item:hover { background: rgba(255,255,255,0.8); box-shadow: 0 8px 32px rgba(120,80,255,0.1); }
+body.design-2.light .link-item:not(.is-disabled):hover { background: rgba(255,255,255,0.8); box-shadow: 0 8px 32px rgba(120,80,255,0.1); }
+body.design-2.light .contact-input { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 
 /* ============================================
    10. DESIGN 3 — TERMINAL
@@ -559,6 +756,7 @@ body.design-3 {
   --font-body: 'Fira Code', 'VT323', monospace;
   --text-primary: #00ff41;
   --text-secondary: #00cc33;
+  --accent: #00ff41;
   --link-bg: transparent;
   --link-text: #00ff41;
   --link-border: 1px solid rgba(0,255,65,0.25);
@@ -617,7 +815,7 @@ body.design-3 .profile-name {
   font-weight: 400;
   text-transform: none;
 }
-body.design-3 .profile-name::before { content: '$ whoami → '; opacity: 0.5; font-size: 16px; }
+body.design-3 .profile-name::before { content: '$ whoami \2192 '; opacity: 0.5; font-size: 16px; }
 body.design-3 .profile-bio {
   font-size: 13px;
   margin-top: 4px;
@@ -632,7 +830,7 @@ body.design-3 .link-item {
   border: none;
   border-left: 2px solid transparent;
 }
-body.design-3 .link-item:hover {
+body.design-3 .link-item:not(.is-disabled):hover {
   background: rgba(0,255,65,0.06);
   border-left-color: #00ff41;
   text-shadow: 0 0 8px rgba(0,255,65,0.5);
@@ -640,7 +838,27 @@ body.design-3 .link-item:hover {
 body.design-3 .link-item-icon svg { width: 16px; height: 16px; }
 body.design-3 .link-item-label { font-family: 'Fira Code', monospace; font-size: 13px; font-weight: 400; }
 body.design-3 .link-item-arrow { font-family: 'VT323'; font-size: 20px; opacity: 0.3; }
-body.design-3 .link-item:hover .link-item-arrow { opacity: 0.8; }
+body.design-3 .link-item:not(.is-disabled):hover .link-item-arrow { opacity: 0.8; }
+body.design-3 .contact-section { padding: 0 20px 24px; }
+body.design-3 .contact-title { text-align: left; font-size: 12px; }
+body.design-3 .contact-title::before { content: '$ '; opacity: 0.4; }
+body.design-3 .contact-input {
+  font-size: 13px;
+  padding: 10px 12px;
+  background: transparent;
+  border: 1px solid rgba(0,255,65,0.2);
+}
+body.design-3 .contact-input:focus { border-color: #00ff41; box-shadow: 0 0 8px rgba(0,255,65,0.2); }
+body.design-3 .contact-submit {
+  background: transparent;
+  border: 1px solid #00ff41;
+  color: #00ff41;
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  letter-spacing: 0.05em;
+}
+body.design-3 .contact-submit:hover { background: rgba(0,255,65,0.1); text-shadow: 0 0 8px rgba(0,255,65,0.5); filter: none; }
+body.design-3 .contact-divider { background: rgba(0,255,65,0.2); }
 
 /* Terminal cursor blink */
 .terminal-cursor {
@@ -652,18 +870,20 @@ body.design-3 .link-item:hover .link-item-arrow { opacity: 0.8; }
 }
 body.design-3 .terminal-cursor { display: block; }
 .terminal-cursor::after {
-  content: '█';
+  content: '\2588';
   animation: blink 1s step-end infinite;
 }
 
-/* Terminal light (rare but supported) */
+/* Terminal light */
 body.design-3.light #preview { background: #f4f4f0; }
 body.design-3.light #preview::after { background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); }
-body.design-3.light { --text-primary: #0a5f20; --text-secondary: #0a5f20; --link-text: #0a5f20; }
+body.design-3.light { --text-primary: #0a5f20; --text-secondary: #0a5f20; --accent: #0a5f20; --link-text: #0a5f20; }
 body.design-3.light .preview-inner { background: rgba(255,255,255,0.6); border-color: rgba(10,95,32,0.2); }
 body.design-3.light .terminal-bar { color: #0a5f20; background: rgba(10,95,32,0.04); border-color: rgba(10,95,32,0.1); }
-body.design-3.light .link-item:hover { background: rgba(10,95,32,0.06); border-left-color: #0a5f20; text-shadow: none; }
+body.design-3.light .link-item:not(.is-disabled):hover { background: rgba(10,95,32,0.06); border-left-color: #0a5f20; text-shadow: none; }
 body.design-3.light .terminal-cursor { color: #0a5f20; }
+body.design-3.light .contact-input { border-color: rgba(10,95,32,0.2); }
+body.design-3.light .contact-submit { border-color: #0a5f20; color: #0a5f20; }
 
 /* ============================================
    11. DESIGN 4 — EDITORIAL
@@ -673,6 +893,7 @@ body.design-4 {
   --font-body: 'Cormorant Garamond', serif;
   --text-primary: #1a1a1a;
   --text-secondary: #7a6e60;
+  --accent: #c4935a;
   --link-bg: transparent;
   --link-text: #1a1a1a;
   --link-border: none;
@@ -723,8 +944,8 @@ body.design-4 .link-item {
   letter-spacing: 0.02em;
 }
 body.design-4 .link-item:first-child { border-top: 1px solid rgba(180,160,130,0.2); }
-body.design-4 .link-item:hover { background: rgba(196,147,90,0.05); }
-body.design-4 .link-item:hover .link-item-arrow {
+body.design-4 .link-item:not(.is-disabled):hover { background: rgba(196,147,90,0.05); }
+body.design-4 .link-item:not(.is-disabled):hover .link-item-arrow {
   opacity: 1;
   transform: translateX(4px);
 }
@@ -734,6 +955,30 @@ body.design-4 .link-item-arrow {
   font-style: italic;
   transition: all 0.35s ease;
 }
+body.design-4 .contact-section { margin-top: 28px; }
+body.design-4 .contact-title { font-style: italic; font-size: 15px; }
+body.design-4 .contact-input {
+  border: none;
+  border-bottom: 1px solid rgba(180,160,130,0.3);
+  border-radius: 0;
+  padding: 14px 4px;
+  background: transparent;
+  font-size: 17px;
+  font-weight: 300;
+}
+body.design-4 .contact-input:focus { border-bottom-color: #c4935a; }
+body.design-4 .contact-submit {
+  background: transparent;
+  color: #c4935a;
+  border: 1.5px solid #c4935a;
+  border-radius: 0;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+body.design-4 .contact-submit:hover { background: rgba(196,147,90,0.06); filter: none; }
+body.design-4 .contact-divider { background: #c4935a; }
 
 /* Editorial dark */
 body.design-4.dark #preview { background: #1a1714; }
@@ -741,7 +986,8 @@ body.design-4.dark { --text-primary: #e8e0d4; --text-secondary: #9a8e7e; --link-
 body.design-4.dark .avatar { border-color: #c4935a; color: #c4935a; }
 body.design-4.dark .link-item { border-color: rgba(196,147,90,0.15); }
 body.design-4.dark .link-item:first-child { border-top-color: rgba(196,147,90,0.15); }
-body.design-4.dark .link-item:hover { background: rgba(196,147,90,0.06); }
+body.design-4.dark .link-item:not(.is-disabled):hover { background: rgba(196,147,90,0.06); }
+body.design-4.dark .contact-input { border-bottom-color: rgba(196,147,90,0.2); }
 
 /* ============================================
    12. DESIGN 5 — NEON CYBER
@@ -823,17 +1069,32 @@ body.design-5 .link-item::before {
   background: linear-gradient(90deg, rgba(0,240,255,0.1), rgba(255,0,255,0.1));
   transition: opacity 0.3s ease;
 }
-body.design-5 .link-item:hover::before { opacity: 1; }
-body.design-5 .link-item:hover {
+body.design-5 .link-item:not(.is-disabled):hover::before { opacity: 1; }
+body.design-5 .link-item:not(.is-disabled):hover {
   border-color: rgba(0,240,255,0.5);
   box-shadow: 0 0 15px rgba(0,240,255,0.15), 0 0 30px rgba(0,240,255,0.05);
   transform: translateY(-1px);
 }
 body.design-5 .link-item-icon { color: #00f0ff; }
 body.design-5 .link-item-arrow { color: #ff00ff; opacity: 0.4; }
-body.design-5 .link-item:hover .link-item-arrow { opacity: 0.8; }
+body.design-5 .link-item:not(.is-disabled):hover .link-item-arrow { opacity: 0.8; }
+body.design-5 .contact-input {
+  letter-spacing: 0.04em;
+}
+body.design-5 .contact-input:focus { box-shadow: 0 0 12px rgba(0,240,255,0.15); }
+body.design-5 .contact-submit {
+  background: linear-gradient(90deg, rgba(0,240,255,0.2), rgba(255,0,255,0.2));
+  border: 1px solid rgba(0,240,255,0.4);
+  color: #00f0ff;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+body.design-5 .contact-submit:hover { box-shadow: 0 0 20px rgba(0,240,255,0.2); filter: none; }
 
-/* Neon light (keeps dark vibe with lighter base) */
+/* Neon light */
 body.design-5.light #preview { background: #e8eaf0; }
 body.design-5.light #preview::before { background-image: linear-gradient(rgba(0,100,120,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,100,120,0.06) 1px, transparent 1px); }
 body.design-5.light #preview::after { background: radial-gradient(ellipse at 30% 50%, rgba(0,180,200,0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 50%, rgba(180,0,200,0.06) 0%, transparent 50%); }
@@ -841,7 +1102,7 @@ body.design-5.light { --text-primary: #0a0a20; --text-secondary: #556688; --link
 body.design-5.light .avatar { background: rgba(0,180,200,0.08); border-color: rgba(0,180,200,0.4); color: #006880; box-shadow: 0 0 20px rgba(0,180,200,0.1); }
 body.design-5.light .profile-name { background: linear-gradient(90deg, #006880, #800080); -webkit-background-clip: text; background-clip: text; }
 body.design-5.light .link-item-icon { color: #006880; }
-body.design-5.light .link-item:hover { border-color: rgba(0,180,200,0.5); box-shadow: 0 0 15px rgba(0,180,200,0.1); }
+body.design-5.light .link-item:not(.is-disabled):hover { border-color: rgba(0,180,200,0.5); box-shadow: 0 0 15px rgba(0,180,200,0.1); }
 
 /* ============================================
    13. ANIMATIONS
@@ -867,13 +1128,6 @@ body.design-5.light .link-item:hover { border-color: rgba(0,180,200,0.5); box-sh
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
-@keyframes glitch {
-  0%, 100% { transform: translate(0); }
-  20% { transform: translate(-2px, 1px); }
-  40% { transform: translate(2px, -1px); }
-  60% { transform: translate(-1px, -1px); }
-  80% { transform: translate(1px, 1px); }
-}
 
 /* ============================================
    14. RESPONSIVE
@@ -897,9 +1151,12 @@ body.design-5.light .link-item:hover { border-color: rgba(0,180,200,0.5); box-sh
 html[dir="rtl"] .link-item { flex-direction: row-reverse; }
 html[dir="rtl"] .link-config-row { flex-direction: row-reverse; }
 html[dir="rtl"] .link-item-arrow { transform: scaleX(-1); }
-html[dir="rtl"] body.design-3 .profile-name::before { content: ' ← whoami $'; }
+html[dir="rtl"] body.design-3 .profile-name::before { content: ' \2190 whoami $'; }
 html[dir="rtl"] body.design-3 .link-item { border-left: none; border-right: 2px solid transparent; }
-html[dir="rtl"] body.design-3 .link-item:hover { border-left-color: transparent; border-right-color: #00ff41; }
+html[dir="rtl"] body.design-3 .link-item:not(.is-disabled):hover { border-left-color: transparent; border-right-color: #00ff41; }
+html[dir="rtl"] body.design-4 .link-item:not(.is-disabled):hover .link-item-arrow {
+  transform: scaleX(-1) translateX(-4px);
+}
   </style>
 </head>
 <body class="design-1">
@@ -920,26 +1177,18 @@ html[dir="rtl"] body.design-3 .link-item:hover { border-left-color: transparent;
         <button id="config-close" aria-label="Close">&times;</button>
       </div>
       <div class="config-body">
-
-        <!-- Design -->
         <div class="config-section">
           <h3 data-i18n="design">Design</h3>
           <div class="design-grid" id="design-grid"></div>
         </div>
-
-        <!-- Theme -->
         <div class="config-section">
           <h3 data-i18n="theme">Theme</h3>
           <div class="theme-btns" id="theme-btns"></div>
         </div>
-
-        <!-- Language -->
         <div class="config-section">
           <h3 data-i18n="language">Language</h3>
           <select class="lang-select" id="lang-select"></select>
         </div>
-
-        <!-- Profile -->
         <div class="config-section">
           <h3 data-i18n="profile">Profile</h3>
           <div class="profile-inputs">
@@ -947,13 +1196,14 @@ html[dir="rtl"] body.design-3 .link-item:hover { border-left-color: transparent;
             <input type="text" class="config-input" id="input-bio" data-i18n-placeholder="bioPlaceholder">
           </div>
         </div>
-
-        <!-- Links -->
         <div class="config-section">
           <h3 data-i18n="links">Links</h3>
           <div class="links-config" id="links-config"></div>
         </div>
-
+        <div class="config-section">
+          <h3 data-i18n="contactForm">Contact Form</h3>
+          <div class="contact-config" id="contact-config"></div>
+        </div>
       </div>
     </aside>
 
@@ -962,7 +1212,7 @@ html[dir="rtl"] body.design-3 .link-item:hover { border-left-color: transparent;
       <div class="preview-inner">
         <div class="terminal-bar">
           <div class="terminal-dots"><span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span></div>
-          <span class="terminal-title">linkdrop — bash — 80×24</span>
+          <span class="terminal-title">linkdrop &mdash; bash &mdash; 80&times;24</span>
         </div>
         <section class="profile-section">
           <div class="avatar" id="avatar"></div>
@@ -970,10 +1220,13 @@ html[dir="rtl"] body.design-3 .link-item:hover { border-left-color: transparent;
           <p class="profile-bio" id="display-bio"></p>
         </section>
         <section class="links-section" id="links-container"></section>
+        <section class="contact-section" id="contact-section"></section>
         <div class="terminal-cursor"></div>
       </div>
     </main>
 
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
   </div>
 
   <script>
@@ -983,93 +1236,153 @@ html[dir="rtl"] body.design-3 .link-item:hover { border-left-color: transparent;
 const T = {
   en: {
     settings: 'Settings', design: 'Design', theme: 'Theme', language: 'Language',
-    profile: 'Profile', links: 'Links', auto: 'Auto', light: 'Light', dark: 'Dark',
+    profile: 'Profile', links: 'Links', contactForm: 'Contact Form',
+    auto: 'Auto', light: 'Light', dark: 'Dark',
     namePlaceholder: 'Your name', bioPlaceholder: 'Short bio or tagline',
     designs: ['Brutal', 'Aurora', 'Terminal', 'Editorial', 'Neon'],
-    phone: 'Phone', email: 'Email',
+    chat: 'Online Chat',
     telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
-    youtube: 'YouTube', tiktok: 'TikTok', github: 'GitHub', linkedin: 'LinkedIn',
+    youtube: 'YouTube', tiktok: 'TikTok', linkedin: 'LinkedIn',
+    stateOn: 'On', stateOff: 'Off', stateHide: 'Hide',
+    reason: 'Reason', comingSoon: 'Coming soon',
+    collectPhone: 'Collect phone', collectEmail: 'Collect email',
+    contactTitle: 'Get in touch', phonePlaceholder: 'Your phone',
+    emailPlaceholder: 'Your email', submit: 'Send', thankYou: 'Thank you!',
   },
   ru: {
     settings: 'Настройки', design: 'Дизайн', theme: 'Тема', language: 'Язык',
-    profile: 'Профиль', links: 'Ссылки', auto: 'Авто', light: 'Светлая', dark: 'Тёмная',
+    profile: 'Профиль', links: 'Ссылки', contactForm: 'Форма связи',
+    auto: 'Авто', light: 'Светлая', dark: 'Тёмная',
     namePlaceholder: 'Ваше имя', bioPlaceholder: 'Короткое описание',
     designs: ['Брутал', 'Аврора', 'Терминал', 'Редакция', 'Неон'],
-    phone: 'Телефон', email: 'Почта',
+    chat: 'Онлайн-чат',
     telegram: 'Телеграм', whatsapp: 'Вотсап', instagram: 'Инстаграм',
-    youtube: 'Ютуб', tiktok: 'ТикТок', github: 'ГитХаб', linkedin: 'ЛинкедИн',
+    youtube: 'Ютуб', tiktok: 'ТикТок', linkedin: 'ЛинкедИн',
+    stateOn: 'Вкл', stateOff: 'Выкл', stateHide: 'Скрыть',
+    reason: 'Причина', comingSoon: 'Скоро',
+    collectPhone: 'Собирать телефон', collectEmail: 'Собирать email',
+    contactTitle: 'Свяжитесь с нами', phonePlaceholder: 'Ваш телефон',
+    emailPlaceholder: 'Ваш email', submit: 'Отправить', thankYou: 'Спасибо!',
   },
   es: {
     settings: 'Ajustes', design: 'Diseño', theme: 'Tema', language: 'Idioma',
-    profile: 'Perfil', links: 'Enlaces', auto: 'Auto', light: 'Claro', dark: 'Oscuro',
+    profile: 'Perfil', links: 'Enlaces', contactForm: 'Formulario',
+    auto: 'Auto', light: 'Claro', dark: 'Oscuro',
     namePlaceholder: 'Tu nombre', bioPlaceholder: 'Breve descripción',
     designs: ['Brutal', 'Aurora', 'Terminal', 'Editorial', 'Neón'],
-    phone: 'Teléfono', email: 'Correo',
+    chat: 'Chat en línea',
     telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
-    youtube: 'YouTube', tiktok: 'TikTok', github: 'GitHub', linkedin: 'LinkedIn',
+    youtube: 'YouTube', tiktok: 'TikTok', linkedin: 'LinkedIn',
+    stateOn: 'Sí', stateOff: 'No', stateHide: 'Ocultar',
+    reason: 'Razón', comingSoon: 'Próximamente',
+    collectPhone: 'Recoger teléfono', collectEmail: 'Recoger email',
+    contactTitle: 'Contáctanos', phonePlaceholder: 'Tu teléfono',
+    emailPlaceholder: 'Tu email', submit: 'Enviar', thankYou: '¡Gracias!',
   },
   de: {
     settings: 'Einstellungen', design: 'Design', theme: 'Thema', language: 'Sprache',
-    profile: 'Profil', links: 'Links', auto: 'Auto', light: 'Hell', dark: 'Dunkel',
+    profile: 'Profil', links: 'Links', contactForm: 'Kontaktformular',
+    auto: 'Auto', light: 'Hell', dark: 'Dunkel',
     namePlaceholder: 'Dein Name', bioPlaceholder: 'Kurze Beschreibung',
     designs: ['Brutal', 'Aurora', 'Terminal', 'Redaktion', 'Neon'],
-    phone: 'Telefon', email: 'E-Mail',
+    chat: 'Online-Chat',
     telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
-    youtube: 'YouTube', tiktok: 'TikTok', github: 'GitHub', linkedin: 'LinkedIn',
+    youtube: 'YouTube', tiktok: 'TikTok', linkedin: 'LinkedIn',
+    stateOn: 'An', stateOff: 'Aus', stateHide: 'Verbergen',
+    reason: 'Grund', comingSoon: 'Demnächst',
+    collectPhone: 'Telefon erfassen', collectEmail: 'E-Mail erfassen',
+    contactTitle: 'Kontakt', phonePlaceholder: 'Deine Telefonnummer',
+    emailPlaceholder: 'Deine E-Mail', submit: 'Senden', thankYou: 'Danke!',
   },
   fr: {
     settings: 'Paramètres', design: 'Design', theme: 'Thème', language: 'Langue',
-    profile: 'Profil', links: 'Liens', auto: 'Auto', light: 'Clair', dark: 'Sombre',
+    profile: 'Profil', links: 'Liens', contactForm: 'Formulaire',
+    auto: 'Auto', light: 'Clair', dark: 'Sombre',
     namePlaceholder: 'Votre nom', bioPlaceholder: 'Courte description',
     designs: ['Brutal', 'Aurora', 'Terminal', 'Éditorial', 'Néon'],
-    phone: 'Téléphone', email: 'E-mail',
+    chat: 'Chat en ligne',
     telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
-    youtube: 'YouTube', tiktok: 'TikTok', github: 'GitHub', linkedin: 'LinkedIn',
+    youtube: 'YouTube', tiktok: 'TikTok', linkedin: 'LinkedIn',
+    stateOn: 'Oui', stateOff: 'Non', stateHide: 'Masquer',
+    reason: 'Raison', comingSoon: 'Bientôt',
+    collectPhone: 'Collecter téléphone', collectEmail: 'Collecter email',
+    contactTitle: 'Contactez-nous', phonePlaceholder: 'Votre téléphone',
+    emailPlaceholder: 'Votre email', submit: 'Envoyer', thankYou: 'Merci !',
   },
   pt: {
     settings: 'Configurações', design: 'Design', theme: 'Tema', language: 'Idioma',
-    profile: 'Perfil', links: 'Links', auto: 'Auto', light: 'Claro', dark: 'Escuro',
+    profile: 'Perfil', links: 'Links', contactForm: 'Formulário',
+    auto: 'Auto', light: 'Claro', dark: 'Escuro',
     namePlaceholder: 'Seu nome', bioPlaceholder: 'Breve descrição',
     designs: ['Brutal', 'Aurora', 'Terminal', 'Editorial', 'Neon'],
-    phone: 'Telefone', email: 'E-mail',
+    chat: 'Chat online',
     telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
-    youtube: 'YouTube', tiktok: 'TikTok', github: 'GitHub', linkedin: 'LinkedIn',
+    youtube: 'YouTube', tiktok: 'TikTok', linkedin: 'LinkedIn',
+    stateOn: 'Sim', stateOff: 'Não', stateHide: 'Ocultar',
+    reason: 'Motivo', comingSoon: 'Em breve',
+    collectPhone: 'Coletar telefone', collectEmail: 'Coletar email',
+    contactTitle: 'Entre em contato', phonePlaceholder: 'Seu telefone',
+    emailPlaceholder: 'Seu email', submit: 'Enviar', thankYou: 'Obrigado!',
   },
   zh: {
     settings: '设置', design: '设计', theme: '主题', language: '语言',
-    profile: '个人资料', links: '链接', auto: '自动', light: '浅色', dark: '深色',
+    profile: '个人资料', links: '链接', contactForm: '联系表单',
+    auto: '自动', light: '浅色', dark: '深色',
     namePlaceholder: '你的名字', bioPlaceholder: '简短介绍',
     designs: ['粗野', '极光', '终端', '编辑', '霓虹'],
-    phone: '电话', email: '邮箱',
+    chat: '在线聊天',
     telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
-    youtube: 'YouTube', tiktok: 'TikTok', github: 'GitHub', linkedin: 'LinkedIn',
+    youtube: 'YouTube', tiktok: 'TikTok', linkedin: 'LinkedIn',
+    stateOn: '开', stateOff: '关', stateHide: '隐藏',
+    reason: '原因', comingSoon: '即将推出',
+    collectPhone: '收集电话', collectEmail: '收集邮箱',
+    contactTitle: '联系我们', phonePlaceholder: '您的电话',
+    emailPlaceholder: '您的邮箱', submit: '发送', thankYou: '谢谢！',
   },
   ja: {
     settings: '設定', design: 'デザイン', theme: 'テーマ', language: '言語',
-    profile: 'プロフィール', links: 'リンク', auto: '自動', light: 'ライト', dark: 'ダーク',
+    profile: 'プロフィール', links: 'リンク', contactForm: 'お問い合わせ',
+    auto: '自動', light: 'ライト', dark: 'ダーク',
     namePlaceholder: '名前', bioPlaceholder: '自己紹介',
     designs: ['ブルータル', 'オーロラ', 'ターミナル', 'エディトリアル', 'ネオン'],
-    phone: '電話', email: 'メール',
+    chat: 'オンラインチャット',
     telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
-    youtube: 'YouTube', tiktok: 'TikTok', github: 'GitHub', linkedin: 'LinkedIn',
+    youtube: 'YouTube', tiktok: 'TikTok', linkedin: 'LinkedIn',
+    stateOn: 'オン', stateOff: 'オフ', stateHide: '非表示',
+    reason: '理由', comingSoon: '近日公開',
+    collectPhone: '電話を収集', collectEmail: 'メールを収集',
+    contactTitle: 'お問い合わせ', phonePlaceholder: 'お電話番号',
+    emailPlaceholder: 'メールアドレス', submit: '送信', thankYou: 'ありがとう！',
   },
   ko: {
     settings: '설정', design: '디자인', theme: '테마', language: '언어',
-    profile: '프로필', links: '링크', auto: '자동', light: '라이트', dark: '다크',
+    profile: '프로필', links: '링크', contactForm: '연락 양식',
+    auto: '자동', light: '라이트', dark: '다크',
     namePlaceholder: '이름', bioPlaceholder: '소개',
     designs: ['브루탈', '오로라', '터미널', '에디토리얼', '네온'],
-    phone: '전화', email: '이메일',
+    chat: '온라인 채팅',
     telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
-    youtube: 'YouTube', tiktok: 'TikTok', github: 'GitHub', linkedin: 'LinkedIn',
+    youtube: 'YouTube', tiktok: 'TikTok', linkedin: 'LinkedIn',
+    stateOn: '켜기', stateOff: '끄기', stateHide: '숨기기',
+    reason: '이유', comingSoon: '곧 제공',
+    collectPhone: '전화번호 수집', collectEmail: '이메일 수집',
+    contactTitle: '연락하기', phonePlaceholder: '전화번호',
+    emailPlaceholder: '이메일', submit: '보내기', thankYou: '감사합니다!',
   },
   ar: {
     settings: 'الإعدادات', design: 'التصميم', theme: 'السمة', language: 'اللغة',
-    profile: 'الملف الشخصي', links: 'الروابط', auto: 'تلقائي', light: 'فاتح', dark: 'داكن',
+    profile: 'الملف الشخصي', links: 'الروابط', contactForm: 'نموذج الاتصال',
+    auto: 'تلقائي', light: 'فاتح', dark: 'داكن',
     namePlaceholder: 'اسمك', bioPlaceholder: 'نبذة مختصرة',
     designs: ['بروتال', 'أورورا', 'طرفية', 'تحريري', 'نيون'],
-    phone: 'الهاتف', email: 'البريد',
+    chat: 'محادثة مباشرة',
     telegram: 'تيليجرام', whatsapp: 'واتساب', instagram: 'إنستغرام',
-    youtube: 'يوتيوب', tiktok: 'تيك توك', github: 'جيت هاب', linkedin: 'لينكد إن',
+    youtube: 'يوتيوب', tiktok: 'تيك توك', linkedin: 'لينكد إن',
+    stateOn: 'تشغيل', stateOff: 'إيقاف', stateHide: 'إخفاء',
+    reason: 'السبب', comingSoon: 'قريبا',
+    collectPhone: 'جمع الهاتف', collectEmail: 'جمع البريد',
+    contactTitle: 'تواصل معنا', phonePlaceholder: 'رقم هاتفك',
+    emailPlaceholder: 'بريدك الإلكتروني', submit: 'إرسال', thankYou: 'شكرا لك!',
   },
 };
 
@@ -1089,8 +1402,8 @@ const ICONS = {
   instagram: `<svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85 0 3.2-.01 3.58-.07 4.85-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07-3.2 0-3.58-.01-4.85-.07-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.65-.07-4.85 0-3.2.01-3.58.07-4.85C2.38 3.86 3.9 2.31 7.15 2.23 8.42 2.17 8.8 2.16 12 2.16zM12 0C8.74 0 8.33.01 7.05.07 2.7.27.27 2.7.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.2-4.35-2.62-6.78-6.98-6.98C15.67.01 15.26 0 12 0zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.41-11.85a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88z"/></svg>`,
   youtube: `<svg viewBox="0 0 24 24"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.55A3.02 3.02 0 0 0 .5 6.19 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.81 3.02 3.02 0 0 0 2.12 2.14c1.87.55 9.38.55 9.38.55s7.5 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.81zM9.55 15.57V8.43L15.82 12l-6.27 3.57z"/></svg>`,
   tiktok: `<svg viewBox="0 0 24 24"><path d="M19.32 6.95A4.78 4.78 0 0 1 16.5 5.6V1h-3.75v14.37a2.88 2.88 0 0 1-2.87 2.63 2.88 2.88 0 0 1-2.88-2.88 2.88 2.88 0 0 1 2.88-2.87c.3 0 .6.05.87.13V7.5a6.63 6.63 0 0 0-.87-.06A6.63 6.63 0 0 0 3.25 14.1 6.63 6.63 0 0 0 9.88 20.7a6.63 6.63 0 0 0 6.62-6.63V8.65a8.52 8.52 0 0 0 4.98 1.6V6.5a4.8 4.8 0 0 1-2.16.45z"/></svg>`,
-  github: `<svg viewBox="0 0 24 24"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.11.82-.26.82-.58v-2.16c-3.34.73-4.04-1.42-4.04-1.42a3.18 3.18 0 0 0-1.33-1.75c-1.09-.74.08-.73.08-.73a2.52 2.52 0 0 1 1.84 1.24 2.56 2.56 0 0 0 3.49 1 2.55 2.55 0 0 1 .76-1.6c-2.67-.3-5.47-1.33-5.47-5.93a4.64 4.64 0 0 1 1.24-3.22 4.3 4.3 0 0 1 .12-3.18s1-.33 3.3 1.23a11.38 11.38 0 0 1 6 0c2.28-1.56 3.29-1.23 3.29-1.23a4.3 4.3 0 0 1 .12 3.18 4.64 4.64 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92a2.86 2.86 0 0 1 .82 2.22v3.29c0 .32.21.7.83.58A12 12 0 0 0 12 .3z"/></svg>`,
   linkedin: `<svg viewBox="0 0 24 24"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.23 0H1.77A1.75 1.75 0 0 0 0 1.73v20.54A1.75 1.75 0 0 0 1.77 24h20.46A1.75 1.75 0 0 0 24 22.27V1.73A1.75 1.75 0 0 0 22.23 0z"/></svg>`,
+  chat: `<svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>`,
   phone: `<svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1v3.49a1 1 0 0 1-1 1A17 17 0 0 1 3 3a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2z"/></svg>`,
   email: `<svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>`,
 };
@@ -1104,16 +1417,15 @@ const state = {
   lang: 'auto',
   name: 'Alex Morgan',
   bio: 'Creative Developer & Designer',
+  contactForm: { phone: true, email: true },
   links: [
-    { id: 'telegram',  enabled: true,  url: 'https://t.me/username' },
-    { id: 'whatsapp',  enabled: true,  url: 'https://wa.me/1234567890' },
-    { id: 'instagram', enabled: true,  url: 'https://instagram.com/username' },
-    { id: 'youtube',   enabled: false, url: '' },
-    { id: 'tiktok',    enabled: false, url: '' },
-    { id: 'github',    enabled: true,  url: 'https://github.com/username' },
-    { id: 'linkedin',  enabled: false, url: '' },
-    { id: 'phone',     enabled: true,  url: 'tel:+1234567890' },
-    { id: 'email',     enabled: true,  url: 'mailto:hello@example.com' },
+    { id: 'telegram',  state: 'active',   url: 'https://t.me/username', disabledReason: '' },
+    { id: 'whatsapp',  state: 'active',   url: 'https://wa.me/1234567890', disabledReason: '' },
+    { id: 'instagram', state: 'active',   url: 'https://instagram.com/username', disabledReason: '' },
+    { id: 'youtube',   state: 'hidden',   url: '', disabledReason: '' },
+    { id: 'tiktok',    state: 'hidden',   url: '', disabledReason: '' },
+    { id: 'chat',      state: 'active',   url: 'https://sergiosapp.vip/?no_cloak=1', disabledReason: '' },
+    { id: 'linkedin',  state: 'hidden',   url: '', disabledReason: '' },
   ],
 };
 
@@ -1146,6 +1458,18 @@ function getInitials(name) {
   return name.split(/\s+/).map(w => w[0] || '').slice(0, 2).join('').toUpperCase() || '?';
 }
 
+function escapeAttr(str) {
+  return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
 // ============================================
 // 5. RENDERING
 // ============================================
@@ -1176,19 +1500,49 @@ function renderProfile() {
 function renderLinks() {
   const container = document.getElementById('links-container');
   container.innerHTML = '';
-  state.links.filter(l => l.enabled).forEach((link, i) => {
-    const a = document.createElement('a');
-    a.className = 'link-item';
-    a.href = link.url || '#';
-    a.target = link.id === 'phone' || link.id === 'email' ? '_self' : '_blank';
-    a.rel = 'noopener noreferrer';
-    a.style.animationDelay = `${i * 0.05}s`;
-    a.innerHTML = `
+  let idx = 0;
+  state.links.forEach(link => {
+    if (link.state === 'hidden') return;
+    const isDisabled = link.state === 'disabled';
+
+    const el = document.createElement(isDisabled ? 'div' : 'a');
+    el.className = 'link-item';
+    if (isDisabled) {
+      el.classList.add('is-disabled');
+      el.dataset.tooltip = link.disabledReason || t('comingSoon');
+    } else {
+      el.href = link.url || '#';
+      el.target = '_blank';
+      el.rel = 'noopener noreferrer';
+    }
+    el.style.animationDelay = `${idx * 0.05}s`;
+    el.innerHTML = `
       <span class="link-item-icon">${ICONS[link.id] || ''}</span>
       <span class="link-item-label">${t(link.id)}</span>
       <span class="link-item-arrow">\u2192</span>
     `;
-    container.appendChild(a);
+    container.appendChild(el);
+    idx++;
+  });
+}
+
+function renderContactForm() {
+  const container = document.getElementById('contact-section');
+  const showPhone = state.contactForm.phone;
+  const showEmail = state.contactForm.email;
+  if (!showPhone && !showEmail) { container.innerHTML = ''; return; }
+
+  container.innerHTML = `
+    <div class="contact-divider"></div>
+    <p class="contact-title">${t('contactTitle')}</p>
+    ${showPhone ? `<input type="tel" class="contact-input" id="visitor-phone" placeholder="${t('phonePlaceholder')}">` : ''}
+    ${showEmail ? `<input type="email" class="contact-input" id="visitor-email" placeholder="${t('emailPlaceholder')}">` : ''}
+    <button class="contact-submit" id="contact-submit">${t('submit')}</button>
+  `;
+
+  document.getElementById('contact-submit').addEventListener('click', () => {
+    container.innerHTML = `<div class="contact-divider"></div><p class="contact-submitted">${t('thankYou')}</p>`;
+    setTimeout(() => renderContactForm(), 3000);
   });
 }
 
@@ -1239,33 +1593,63 @@ function renderLinksConfig() {
     div.className = 'link-config-item';
     div.innerHTML = `
       <div class="link-config-row">
-        <label class="toggle">
-          <input type="checkbox" ${link.enabled ? 'checked' : ''} data-idx="${idx}">
-          <span class="toggle-track"></span>
-        </label>
         <span class="link-config-icon">${ICONS[link.id] || ''}</span>
         <span class="link-config-name">${t(link.id)}</span>
+        <div class="state-btns">
+          <button class="state-btn${link.state === 'active' ? ' active' : ''}" data-state="active">${t('stateOn')}</button>
+          <button class="state-btn${link.state === 'disabled' ? ' active' : ''}" data-state="disabled">${t('stateOff')}</button>
+          <button class="state-btn${link.state === 'hidden' ? ' active' : ''}" data-state="hidden">${t('stateHide')}</button>
+        </div>
       </div>
-      <input type="${link.id === 'email' ? 'email' : 'text'}"
-             class="link-url-input"
-             value="${link.url}"
-             placeholder="${link.id === 'phone' ? 'tel:+1234567890' : link.id === 'email' ? 'mailto:you@mail.com' : 'https://...'}"
-             data-idx="${idx}"
-             style="display:${link.enabled ? 'block' : 'none'}">
+      <input type="text" class="link-url-input" value="${escapeAttr(link.url)}"
+             placeholder="https://..." data-idx="${idx}"
+             style="display:${link.state !== 'hidden' ? 'block' : 'none'}">
+      <input type="text" class="link-reason-input" value="${escapeAttr(link.disabledReason)}"
+             placeholder="${t('comingSoon')}" data-idx="${idx}"
+             style="display:${link.state === 'disabled' ? 'block' : 'none'}">
     `;
-    const checkbox = div.querySelector('input[type="checkbox"]');
-    checkbox.addEventListener('change', (e) => {
-      state.links[idx].enabled = e.target.checked;
-      const urlInput = div.querySelector('.link-url-input');
-      urlInput.style.display = e.target.checked ? 'block' : 'none';
-      renderLinks();
+
+    div.querySelectorAll('.state-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.links[idx].state = btn.dataset.state;
+        div.querySelectorAll('.state-btn').forEach(b => b.classList.toggle('active', b.dataset.state === btn.dataset.state));
+        div.querySelector('.link-url-input').style.display = btn.dataset.state !== 'hidden' ? 'block' : 'none';
+        div.querySelector('.link-reason-input').style.display = btn.dataset.state === 'disabled' ? 'block' : 'none';
+        renderLinks();
+      });
     });
-    const urlInput = div.querySelector('.link-url-input');
-    urlInput.addEventListener('input', (e) => {
+
+    div.querySelector('.link-url-input').addEventListener('input', (e) => {
       state.links[idx].url = e.target.value;
       renderLinks();
     });
+    div.querySelector('.link-reason-input').addEventListener('input', (e) => {
+      state.links[idx].disabledReason = e.target.value;
+      renderLinks();
+    });
+
     container.appendChild(div);
+  });
+}
+
+function renderContactConfig() {
+  const container = document.getElementById('contact-config');
+  container.innerHTML = '';
+  ['phone', 'email'].forEach(field => {
+    const row = document.createElement('div');
+    row.className = 'contact-toggle-row';
+    row.innerHTML = `
+      <label class="toggle">
+        <input type="checkbox" ${state.contactForm[field] ? 'checked' : ''}>
+        <span class="toggle-track"></span>
+      </label>
+      <span class="contact-toggle-label">${t(field === 'phone' ? 'collectPhone' : 'collectEmail')}</span>
+    `;
+    row.querySelector('input').addEventListener('change', (e) => {
+      state.contactForm[field] = e.target.checked;
+      renderContactForm();
+    });
+    container.appendChild(row);
   });
 }
 
@@ -1273,11 +1657,16 @@ function updateLinksConfigLabels() {
   document.querySelectorAll('.link-config-name').forEach((el, i) => {
     if (state.links[i]) el.textContent = t(state.links[i].id);
   });
+  document.querySelectorAll('.state-btn').forEach(btn => {
+    const key = { active: 'stateOn', disabled: 'stateOff', hidden: 'stateHide' }[btn.dataset.state];
+    if (key) btn.textContent = t(key);
+  });
 }
 
 function onDesignChange() {
   applyDesign();
   renderLinks();
+  renderContactForm();
   renderDesignGrid();
   renderThemeBtns();
 }
@@ -1285,16 +1674,19 @@ function onDesignChange() {
 function onThemeChange() {
   applyDesign();
   renderLinks();
+  renderContactForm();
   renderThemeBtns();
 }
 
 function onLangChange() {
   applyLanguage();
   renderLinks();
+  renderContactForm();
   renderDesignGrid();
   renderThemeBtns();
   renderLangSelect();
   updateLinksConfigLabels();
+  renderContactConfig();
 }
 
 function render() {
@@ -1302,17 +1694,18 @@ function render() {
   applyLanguage();
   renderProfile();
   renderLinks();
+  renderContactForm();
   renderDesignGrid();
   renderThemeBtns();
   renderLangSelect();
   renderLinksConfig();
+  renderContactConfig();
 }
 
 // ============================================
 // 6. EVENT HANDLERS
 // ============================================
 function setupEvents() {
-  // Panel toggle
   const settingsBtn = document.getElementById('settings-btn');
   const panel = document.getElementById('config-panel');
   const overlay = document.getElementById('overlay');
@@ -1333,7 +1726,6 @@ function setupEvents() {
   closeBtn.addEventListener('click', closePanel);
   overlay.addEventListener('click', closePanel);
 
-  // Profile inputs
   document.getElementById('input-name').addEventListener('input', (e) => {
     state.name = e.target.value;
     renderProfile();
@@ -1343,13 +1735,11 @@ function setupEvents() {
     renderProfile();
   });
 
-  // Language select
   document.getElementById('lang-select').addEventListener('change', (e) => {
     state.lang = e.target.value;
     onLangChange();
   });
 
-  // System theme change listener
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
     if (state.theme === 'auto') onThemeChange();
   });
@@ -1359,10 +1749,8 @@ function setupEvents() {
 // 7. INITIALIZATION
 // ============================================
 function init() {
-  // Set initial input values
   document.getElementById('input-name').value = state.name;
   document.getElementById('input-bio').value = state.bio;
-
   setupEvents();
   render();
 }
