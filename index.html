@@ -421,17 +421,8 @@ input, select { font: inherit; color: inherit; }
   transition: all 0.3s ease;
 }
 
-/* Entry animation */
+/* Entry animation — delays set via JS inline style for dynamic link ordering */
 .link-item { animation: linkEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
-.link-item:nth-child(1) { animation-delay: 0.05s; }
-.link-item:nth-child(2) { animation-delay: 0.1s; }
-.link-item:nth-child(3) { animation-delay: 0.15s; }
-.link-item:nth-child(4) { animation-delay: 0.2s; }
-.link-item:nth-child(5) { animation-delay: 0.25s; }
-.link-item:nth-child(6) { animation-delay: 0.3s; }
-.link-item:nth-child(7) { animation-delay: 0.35s; }
-.link-item:nth-child(8) { animation-delay: 0.4s; }
-.link-item:nth-child(9) { animation-delay: 0.45s; }
 
 .profile-section { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
 
@@ -1159,13 +1150,7 @@ function getInitials(name) {
 // 5. RENDERING
 // ============================================
 function applyDesign() {
-  const body = document.body;
-  body.className = `design-${state.design}`;
-  const theme = getEffectiveTheme();
-  if ((state.design === 1 || state.design === 4) && theme === 'dark') body.classList.add('dark');
-  if ((state.design === 2) && theme === 'light') body.classList.add('light');
-  if ((state.design === 3) && theme === 'light') body.classList.add('light');
-  if ((state.design === 5) && theme === 'light') body.classList.add('light');
+  document.body.className = `design-${state.design} ${getEffectiveTheme()}`;
 }
 
 function applyLanguage() {
@@ -1217,7 +1202,7 @@ function renderDesignGrid() {
     btn.className = `design-option${state.design === i ? ' active' : ''}`;
     btn.dataset.design = i;
     btn.innerHTML = `<span class="design-swatch design-swatch-${i}"></span><span>${names[i-1]}</span>`;
-    btn.addEventListener('click', () => { state.design = i; render(); });
+    btn.addEventListener('click', () => { state.design = i; onDesignChange(); });
     grid.appendChild(btn);
   }
 }
@@ -1229,7 +1214,7 @@ function renderThemeBtns() {
     const btn = document.createElement('button');
     btn.className = `theme-btn${state.theme === th ? ' active' : ''}`;
     btn.textContent = t(th);
-    btn.addEventListener('click', () => { state.theme = th; render(); });
+    btn.addEventListener('click', () => { state.theme = th; onThemeChange(); });
     container.appendChild(btn);
   });
 }
@@ -1284,6 +1269,34 @@ function renderLinksConfig() {
   });
 }
 
+function updateLinksConfigLabels() {
+  document.querySelectorAll('.link-config-name').forEach((el, i) => {
+    if (state.links[i]) el.textContent = t(state.links[i].id);
+  });
+}
+
+function onDesignChange() {
+  applyDesign();
+  renderLinks();
+  renderDesignGrid();
+  renderThemeBtns();
+}
+
+function onThemeChange() {
+  applyDesign();
+  renderLinks();
+  renderThemeBtns();
+}
+
+function onLangChange() {
+  applyLanguage();
+  renderLinks();
+  renderDesignGrid();
+  renderThemeBtns();
+  renderLangSelect();
+  updateLinksConfigLabels();
+}
+
 function render() {
   applyDesign();
   applyLanguage();
@@ -1333,12 +1346,12 @@ function setupEvents() {
   // Language select
   document.getElementById('lang-select').addEventListener('change', (e) => {
     state.lang = e.target.value;
-    render();
+    onLangChange();
   });
 
   // System theme change listener
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    if (state.theme === 'auto') render();
+    if (state.theme === 'auto') onThemeChange();
   });
 }
 
