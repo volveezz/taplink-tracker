@@ -325,6 +325,39 @@ input, select { font: inherit; color: inherit; }
 .link-reason-input:focus { outline: none; border-color: rgba(255,180,50,0.25); }
 .link-reason-input::placeholder { color: #665530; }
 
+/* Particle config sliders */
+.particle-config { display: flex; flex-direction: column; gap: 12px; }
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.slider-label { font-size: 12px; color: #888; min-width: 65px; }
+.slider-value { font-size: 12px; color: #aaa; min-width: 32px; text-align: right; font-family: 'Fira Code', monospace; }
+.slider-row input[type="range"] {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  outline: none;
+}
+.slider-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #5bd97a;
+  cursor: pointer;
+}
+.no-particles-msg {
+  font-size: 12px;
+  color: #555;
+  font-style: italic;
+  padding: 4px 0;
+}
+
 /* Contact form toggles */
 .contact-config { display: flex; flex-direction: column; gap: 12px; }
 .contact-toggle-row {
@@ -368,11 +401,11 @@ input, select { font: inherit; color: inherit; }
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden auto;
   padding: 40px 20px;
   transition: background 0.6s ease;
   position: relative;
+  clip-path: inset(0);
 }
 
 .preview-inner {
@@ -383,6 +416,11 @@ input, select { font: inherit; color: inherit; }
   z-index: 1;
   padding: 48px 28px 40px;
   transition: all 0.5s ease;
+  isolation: isolate;
+}
+.profile-section, .links-section, .contact-section, .terminal-bar, .terminal-cursor {
+  position: relative;
+  z-index: 2;
 }
 
 /* ============================================
@@ -406,6 +444,21 @@ input, select { font: inherit; color: inherit; }
   position: relative;
   overflow: hidden;
 }
+.avatar.square { border-radius: 16px; }
+.avatar.hidden { display: none; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+
+/* Avatar config */
+.avatar-config { display: flex; flex-direction: column; gap: 12px; }
+.avatar-toggle-row { display: flex; align-items: center; gap: 10px; }
+.avatar-toggle-label { font-size: 14px; font-weight: 500; }
+.avatar-shape-row { display: flex; align-items: center; gap: 8px; }
+.avatar-shape-label { font-size: 12px; color: #888; min-width: 50px; }
+.shape-btns { display: flex; gap: 4px; background: rgba(255,255,255,0.04); border-radius: 6px; padding: 2px; }
+.shape-btn { padding: 5px 12px; border-radius: 5px; font-size: 12px; color: #666; transition: all 0.2s; }
+.shape-btn:hover { color: #aaa; }
+.shape-btn.active { background: rgba(255,255,255,0.1); color: #ddd; }
+
 .profile-name {
   font-family: var(--font-heading, 'Outfit');
   font-size: 26px;
@@ -474,35 +527,33 @@ input, select { font: inherit; color: inherit; }
 
 /* Disabled link state */
 .link-item.is-disabled {
-  opacity: 0.3;
+  opacity: 0.35;
   cursor: default;
   filter: grayscale(0.4);
-  pointer-events: auto;
 }
-.link-item.is-disabled:hover { opacity: 0.45; }
-.link-item.is-disabled[data-tooltip]::after {
-  content: attr(data-tooltip);
+.link-item.is-disabled .link-item-label,
+.link-item.is-disabled .link-item-arrow {
+  transition: opacity 0.3s ease;
+}
+.link-item.is-disabled .link-item-reason {
   position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%) translateY(4px);
-  background: rgba(0,0,0,0.9);
-  color: #fff;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-family: 'Outfit', sans-serif;
-  font-weight: 400;
-  white-space: nowrap;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 13px;
   opacity: 0;
+  font-style: italic;
+  white-space: nowrap;
+  transition: opacity 0.3s ease;
   pointer-events: none;
-  transition: all 0.2s ease;
-  z-index: 10;
 }
-.link-item.is-disabled:hover[data-tooltip]::after {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
+.link-item.is-disabled:hover {
+  opacity: 0.55;
 }
+.link-item.is-disabled:hover .link-item-label,
+.link-item.is-disabled:hover .link-item-icon,
+.link-item.is-disabled:hover .link-item-arrow { opacity: 0; }
+.link-item.is-disabled:hover .link-item-reason { opacity: 0.8; }
 
 /* ============================================
    7b. CONTACT FORM
@@ -1105,75 +1156,187 @@ body.design-5.light .link-item-icon { color: #006880; }
 body.design-5.light .link-item:not(.is-disabled):hover { border-color: rgba(0,180,200,0.5); box-shadow: 0 0 15px rgba(0,180,200,0.1); }
 
 /* ============================================
-   13. ANIMATIONS
+   PARTICLE SYSTEM
    ============================================ */
-/* ============================================
-   13b. PARTICLE SYSTEM
-   ============================================ */
-.particles-layer {
+#particles {
   position: absolute;
   inset: 0;
-  overflow: hidden;
   pointer-events: none;
   z-index: 0;
+  overflow: hidden;
 }
-.p {
+.particle {
   position: absolute;
   pointer-events: none;
-  user-select: none;
-  will-change: transform;
-  color: var(--text-primary, #fff);
-  line-height: 1;
-  font-weight: 400;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12));
+  animation: particleFloat ease-in-out infinite alternate;
+}
+@keyframes particleFloat {
+  0%   { translate: 0 0;          rotate: var(--rot, 0deg); }
+  25%  { translate: 12px -18px;   rotate: calc(var(--rot, 0deg) + 3deg); }
+  50%  { translate: -8px -30px;   rotate: calc(var(--rot, 0deg) - 2deg); }
+  75%  { translate: 15px -12px;   rotate: calc(var(--rot, 0deg) + 4deg); }
+  100% { translate: -5px -24px;   rotate: calc(var(--rot, 0deg) - 3deg); }
 }
 
-/* Falling — money rain, matrix characters */
-.p-fall {
-  top: -30px;
-  opacity: 0;
-  animation: pFall var(--p-dur, 8s) linear infinite;
-}
-@keyframes pFall {
-  0% { transform: translateY(0) rotate(var(--p-r0, 0deg)); opacity: 0; }
-  4% { opacity: var(--p-op, 0.12); }
-  92% { opacity: var(--p-op, 0.12); }
-  100% { transform: translateY(110vh) rotate(var(--p-r1, 360deg)); opacity: 0; }
-}
+/* ============================================
+   NEW DESIGN SWATCHES
+   ============================================ */
+.design-swatch-6 { background: #fff; border: 2px solid #2ecc71; }
+.design-swatch-6::after { content: '$'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #2ecc71; font-weight: 900; font-size: 18px; }
+.design-swatch-7 { background: #f8f0ff; border: 1px solid #b388ff; }
+.design-swatch-7::after { content: '\2726'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #b388ff; font-size: 16px; }
+.design-swatch-8 { background: #0e0e0e; border: 1px solid #39ff14; }
+.design-swatch-8::after { content: '\2620'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #39ff14; font-size: 14px; }
+.design-swatch-9 { background: #f5f0e8; border: 1px solid #b8963e; }
+.design-swatch-9::after { content: '\2736'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #b8963e; font-size: 16px; }
+.design-swatch-10 { background: #080818; border: 1px solid #00d4ff; }
+.design-swatch-10::after { content: '\25C6'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #00d4ff; font-size: 14px; }
 
-/* Floating — dreamy drift, gold dust */
-.p-float {
-  opacity: var(--p-op, 0.08);
-  animation: pFloat var(--p-dur, 14s) ease-in-out infinite;
+/* ============================================
+   D6 — HUSTLE (money particles, white bg)
+   ============================================ */
+body.design-6 {
+  --font-heading: 'Archivo Black', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666;
+  --accent: #2ecc71;
+  --link-bg: #f0faf4;
+  --link-text: #1a1a1a;
+  --link-border: 2px solid #2ecc71;
+  --link-radius: 14px;
+  --link-shadow: none;
+  --avatar-size: 88px;
 }
-@keyframes pFloat {
-  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
-  25% { transform: translate(var(--p-dx, 12px), var(--p-dy, -18px)) rotate(90deg) scale(1.1); }
-  50% { transform: translate(calc(var(--p-dx, 12px) * -0.6), calc(var(--p-dy, -18px) * 1.8)) rotate(180deg) scale(0.9); }
-  75% { transform: translate(calc(var(--p-dx, 12px) * 0.8), calc(var(--p-dy, -18px) * 0.6)) rotate(270deg) scale(1.05); }
-}
+body.design-6 #preview { background: #fff; }
+body.design-6 .avatar { background: #2ecc71; color: #fff; font-family: 'Archivo Black'; }
+body.design-6 .profile-name { text-transform: uppercase; font-size: 26px; }
+body.design-6 .link-item:not(.is-disabled):hover { background: #2ecc71; color: #fff; border-color: #2ecc71; }
+body.design-6 .contact-submit { background: #2ecc71; }
+body.design-6.dark #preview { background: #0e1a12; }
+body.design-6.dark { --text-primary: #e0f0e8; --text-secondary: #80a090; --link-bg: rgba(46,204,113,0.08); --link-text: #e0f0e8; }
+body.design-6.dark .avatar { background: #2ecc71; }
 
-/* Rising — neon energy */
-.p-rise {
-  bottom: -20px;
-  opacity: 0;
-  animation: pRise var(--p-dur, 10s) linear infinite;
+/* ============================================
+   D7 — DREAMY (crystal particles, pastel bg)
+   ============================================ */
+body.design-7 {
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+  --text-primary: #4a3a6a;
+  --text-secondary: #8a7aaa;
+  --accent: #b388ff;
+  --link-bg: rgba(179,136,255,0.08);
+  --link-text: #4a3a6a;
+  --link-border: 1.5px solid rgba(179,136,255,0.2);
+  --link-radius: 50px;
+  --link-shadow: none;
+  --avatar-size: 90px;
 }
-@keyframes pRise {
-  0% { transform: translateY(0) scale(0.4); opacity: 0; }
-  6% { opacity: var(--p-op, 0.1); }
-  50% { transform: translateY(-50vh) scale(1); }
-  94% { opacity: var(--p-op, 0.1); }
-  100% { transform: translateY(-110vh) scale(0.4); opacity: 0; }
+body.design-7 #preview { background: #f8f0ff; }
+body.design-7 .avatar { background: linear-gradient(135deg, #b388ff, #ff80ab); color: #fff; font-weight: 300; font-size: 30px; }
+body.design-7 .profile-name { font-weight: 600; }
+body.design-7 .profile-bio { font-weight: 300; }
+body.design-7 .link-item:not(.is-disabled):hover { background: rgba(179,136,255,0.18); border-color: rgba(179,136,255,0.4); }
+body.design-7 .contact-input { border-radius: 50px; }
+body.design-7 .contact-submit { background: linear-gradient(135deg, #b388ff, #ff80ab); border-radius: 50px; }
+body.design-7.dark #preview { background: #1a1020; }
+body.design-7.dark { --text-primary: #e0d0f0; --text-secondary: #8a7a9a; --link-bg: rgba(179,136,255,0.06); --link-text: #e0d0f0; }
+body.design-7.dark .avatar { background: linear-gradient(135deg, rgba(179,136,255,0.4), rgba(255,128,171,0.3)); }
+
+/* ============================================
+   D8 — SHADOW (hacker particles, dark bg)
+   ============================================ */
+body.design-8 {
+  --font-heading: 'Rajdhani', sans-serif;
+  --font-body: 'Rajdhani', sans-serif;
+  --text-primary: #d0d0d0;
+  --text-secondary: #707070;
+  --accent: #39ff14;
+  --link-bg: rgba(57,255,20,0.04);
+  --link-text: #d0d0d0;
+  --link-border: 1px solid rgba(57,255,20,0.15);
+  --link-radius: 6px;
+  --link-shadow: none;
+  --avatar-size: 82px;
 }
+body.design-8 #preview { background: #0c0c0c; }
+body.design-8 .avatar { background: rgba(57,255,20,0.08); border: 1px solid rgba(57,255,20,0.25); color: #39ff14; font-family: 'Rajdhani'; font-weight: 700; }
+body.design-8 .profile-name { font-weight: 700; font-size: 28px; text-transform: uppercase; letter-spacing: 0.06em; }
+body.design-8 .link-item { font-weight: 600; letter-spacing: 0.03em; font-size: 16px; }
+body.design-8 .link-item:not(.is-disabled):hover { border-color: rgba(57,255,20,0.5); background: rgba(57,255,20,0.08); }
+body.design-8 .link-item-icon { color: #39ff14; }
+body.design-8 .contact-input { background: rgba(57,255,20,0.04); border: 1px solid rgba(57,255,20,0.15); }
+body.design-8 .contact-input:focus { border-color: #39ff14; }
+body.design-8 .contact-submit { background: #39ff14; color: #000; font-weight: 700; letter-spacing: 0.04em; }
+body.design-8.light #preview { background: #f0f5f0; }
+body.design-8.light { --text-primary: #1a1a1a; --text-secondary: #555; --accent: #1a8a10; --link-bg: rgba(26,138,16,0.05); --link-text: #1a1a1a; --link-border: 1px solid rgba(26,138,16,0.2); }
+body.design-8.light .avatar { color: #1a8a10; border-color: rgba(26,138,16,0.3); background: rgba(26,138,16,0.06); }
+body.design-8.light .link-item-icon { color: #1a8a10; }
+body.design-8.light .contact-submit { background: #1a8a10; }
 
-/* Design-specific particle colors */
-body.design-1 .p { color: #000; }
-body.design-1.dark .p { color: #FFE600; }
-body.design-3 .p { color: #00ff41; text-shadow: 0 0 6px rgba(0,255,65,0.4); }
-body.design-3.light .p { color: #0a5f20; text-shadow: none; }
-body.design-4 .p { color: #c4935a; }
-body.design-5 .p { color: #00f0ff; text-shadow: 0 0 8px rgba(0,240,255,0.3); }
+/* ============================================
+   D9 — PRESTIGE (luxury particles, cream bg)
+   ============================================ */
+body.design-9 {
+  --font-heading: 'Cormorant Garamond', serif;
+  --font-body: 'Cormorant Garamond', serif;
+  --text-primary: #2a2318;
+  --text-secondary: #8a7e6e;
+  --accent: #b8963e;
+  --link-bg: rgba(184,150,62,0.05);
+  --link-text: #2a2318;
+  --link-border: 1px solid rgba(184,150,62,0.18);
+  --link-radius: 8px;
+  --link-shadow: none;
+  --avatar-size: 82px;
+}
+body.design-9 #preview { background: #f5f0e8; }
+body.design-9 .avatar { background: transparent; border: 1.5px solid #b8963e; color: #b8963e; font-family: 'Cormorant Garamond'; font-style: italic; font-size: 26px; }
+body.design-9 .profile-name { font-size: 30px; font-weight: 600; }
+body.design-9 .profile-bio { font-size: 17px; font-weight: 300; }
+body.design-9 .link-item { font-size: 17px; font-weight: 400; letter-spacing: 0.02em; }
+body.design-9 .link-item:not(.is-disabled):hover { background: rgba(184,150,62,0.1); }
+body.design-9 .contact-input { font-size: 17px; font-weight: 300; }
+body.design-9 .contact-submit { background: #b8963e; font-family: 'Cormorant Garamond'; font-size: 17px; letter-spacing: 0.04em; }
+body.design-9.dark #preview { background: #18150f; }
+body.design-9.dark { --text-primary: #e8e0d0; --text-secondary: #8a806e; --link-bg: rgba(184,150,62,0.05); --link-text: #e8e0d0; }
+body.design-9.dark .avatar { border-color: #b8963e; color: #b8963e; }
 
+/* ============================================
+   D10 — MOON (crypto particles, dark navy bg)
+   ============================================ */
+body.design-10 {
+  --font-heading: 'Orbitron', sans-serif;
+  --font-body: 'Rajdhani', sans-serif;
+  --text-primary: #e0e8ff;
+  --text-secondary: #6878a0;
+  --accent: #00d4ff;
+  --link-bg: rgba(0,212,255,0.04);
+  --link-text: #e0e8ff;
+  --link-border: 1px solid rgba(0,212,255,0.12);
+  --link-radius: 10px;
+  --link-shadow: none;
+  --avatar-size: 86px;
+}
+body.design-10 #preview { background: #060610; }
+body.design-10 .avatar { background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.25); color: #00d4ff; font-family: 'Orbitron'; font-size: 22px; }
+body.design-10 .profile-name { font-size: 20px; text-transform: uppercase; letter-spacing: 0.1em; }
+body.design-10 .link-item { font-weight: 500; letter-spacing: 0.04em; }
+body.design-10 .link-item:not(.is-disabled):hover { border-color: rgba(0,212,255,0.35); background: rgba(0,212,255,0.08); }
+body.design-10 .link-item-icon { color: #00d4ff; }
+body.design-10 .contact-input { letter-spacing: 0.03em; }
+body.design-10 .contact-submit { background: linear-gradient(90deg, #00d4ff, #a855f7); font-family: 'Orbitron'; text-transform: uppercase; letter-spacing: 0.06em; font-size: 13px; }
+body.design-10.light #preview { background: #f0f4fa; }
+body.design-10.light { --text-primary: #0a0a20; --text-secondary: #556688; --link-bg: rgba(0,180,200,0.04); --link-text: #0a0a20; --link-border: 1px solid rgba(0,180,200,0.15); }
+body.design-10.light .avatar { color: #006880; border-color: rgba(0,180,200,0.3); background: rgba(0,180,200,0.06); }
+body.design-10.light .link-item-icon { color: #006880; }
+
+/* ============================================
+   13. ANIMATIONS
+   ============================================ */
 @keyframes fadeSlideUp {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
@@ -1264,8 +1427,16 @@ html[dir="rtl"] body.design-4 .link-item:not(.is-disabled):hover .link-item-arro
           </div>
         </div>
         <div class="config-section">
+          <h3 data-i18n="avatarSettings">Avatar</h3>
+          <div class="avatar-config" id="avatar-config"></div>
+        </div>
+        <div class="config-section">
           <h3 data-i18n="links">Links</h3>
           <div class="links-config" id="links-config"></div>
+        </div>
+        <div class="config-section">
+          <h3 data-i18n="particles">Particles</h3>
+          <div class="particle-config" id="particle-config"></div>
         </div>
         <div class="config-section">
           <h3 data-i18n="contactForm">Contact Form</h3>
@@ -1276,6 +1447,7 @@ html[dir="rtl"] body.design-4 .link-item:not(.is-disabled):hover .link-item-arro
 
     <!-- Preview -->
     <main id="preview">
+      <div id="particles"></div>
       <div class="preview-inner">
         <div class="terminal-bar">
           <div class="terminal-dots"><span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span></div>
@@ -1306,12 +1478,16 @@ const T = {
     profile: 'Profile', links: 'Links', contactForm: 'Contact Form',
     auto: 'Auto', light: 'Light', dark: 'Dark',
     namePlaceholder: 'Your name', bioPlaceholder: 'Short bio or tagline',
-    designs: ['Brutal', 'Aurora', 'Terminal', 'Editorial', 'Neon'],
-    chat: 'Online Chat',
+    designs: ['Brutal', 'Aurora', 'Terminal', 'Editorial', 'Neon', 'Hustle', 'Dreamy', 'Shadow', 'Prestige', 'Moon'],
+    chat: 'Online Chat', threads: 'Threads',
     telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
     youtube: 'YouTube', tiktok: 'TikTok', linkedin: 'LinkedIn',
+    avatarSettings: 'Avatar', showAvatar: 'Show avatar',
+    avatarRound: 'Round', avatarSquare: 'Square', avatarUrl: 'Image URL',
     stateOn: 'On', stateOff: 'Off', stateHide: 'Hide',
     reason: 'Reason', comingSoon: 'Coming soon',
+    particles: 'Particles', density: 'Density', speed: 'Speed',
+    minSize: 'Min size', maxSize: 'Max size', opacity: 'Opacity',
     collectPhone: 'Collect phone', collectEmail: 'Collect email',
     contactTitle: 'Get in touch', phonePlaceholder: 'Your phone',
     emailPlaceholder: 'Your email', submit: 'Send', thankYou: 'Thank you!',
@@ -1321,12 +1497,16 @@ const T = {
     profile: 'Профиль', links: 'Ссылки', contactForm: 'Форма связи',
     auto: 'Авто', light: 'Светлая', dark: 'Тёмная',
     namePlaceholder: 'Ваше имя', bioPlaceholder: 'Короткое описание',
-    designs: ['Брутал', 'Аврора', 'Терминал', 'Редакция', 'Неон'],
-    chat: 'Онлайн-чат',
+    designs: ['Брутал', 'Аврора', 'Терминал', 'Редакция', 'Неон', 'Хастл', 'Мечта', 'Тень', 'Престиж', 'Луна'],
+    chat: 'Онлайн-чат', threads: 'Треды',
     telegram: 'Телеграм', whatsapp: 'Вотсап', instagram: 'Инстаграм',
     youtube: 'Ютуб', tiktok: 'ТикТок', linkedin: 'ЛинкедИн',
+    avatarSettings: 'Аватар', showAvatar: 'Показать аватар',
+    avatarRound: 'Круг', avatarSquare: 'Квадрат', avatarUrl: 'Ссылка на фото',
     stateOn: 'Вкл', stateOff: 'Выкл', stateHide: 'Скрыть',
     reason: 'Причина', comingSoon: 'Скоро',
+    particles: 'Частицы', density: 'Плотность', speed: 'Скорость',
+    minSize: 'Мин размер', maxSize: 'Макс размер', opacity: 'Прозрачность',
     collectPhone: 'Собирать телефон', collectEmail: 'Собирать email',
     contactTitle: 'Свяжитесь с нами', phonePlaceholder: 'Ваш телефон',
     emailPlaceholder: 'Ваш email', submit: 'Отправить', thankYou: 'Спасибо!',
@@ -1336,7 +1516,7 @@ const T = {
     profile: 'Perfil', links: 'Enlaces', contactForm: 'Formulario',
     auto: 'Auto', light: 'Claro', dark: 'Oscuro',
     namePlaceholder: 'Tu nombre', bioPlaceholder: 'Breve descripción',
-    designs: ['Brutal', 'Aurora', 'Terminal', 'Editorial', 'Neón'],
+    designs: ['Brutal', 'Aurora', 'Terminal', 'Editorial', 'Neón', 'Hustle', 'Soñar', 'Sombra', 'Prestigio', 'Luna'],
     chat: 'Chat en línea',
     telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
     youtube: 'YouTube', tiktok: 'TikTok', linkedin: 'LinkedIn',
@@ -1351,7 +1531,7 @@ const T = {
     profile: 'Profil', links: 'Links', contactForm: 'Kontaktformular',
     auto: 'Auto', light: 'Hell', dark: 'Dunkel',
     namePlaceholder: 'Dein Name', bioPlaceholder: 'Kurze Beschreibung',
-    designs: ['Brutal', 'Aurora', 'Terminal', 'Redaktion', 'Neon'],
+    designs: ['Brutal', 'Aurora', 'Terminal', 'Redaktion', 'Neon', 'Hustle', 'Traum', 'Schatten', 'Prestige', 'Mond'],
     chat: 'Online-Chat',
     telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
     youtube: 'YouTube', tiktok: 'TikTok', linkedin: 'LinkedIn',
@@ -1366,7 +1546,7 @@ const T = {
     profile: 'Profil', links: 'Liens', contactForm: 'Formulaire',
     auto: 'Auto', light: 'Clair', dark: 'Sombre',
     namePlaceholder: 'Votre nom', bioPlaceholder: 'Courte description',
-    designs: ['Brutal', 'Aurora', 'Terminal', 'Éditorial', 'Néon'],
+    designs: ['Brutal', 'Aurora', 'Terminal', 'Éditorial', 'Néon', 'Hustle', 'Rêveur', 'Ombre', 'Prestige', 'Lune'],
     chat: 'Chat en ligne',
     telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
     youtube: 'YouTube', tiktok: 'TikTok', linkedin: 'LinkedIn',
@@ -1381,7 +1561,7 @@ const T = {
     profile: 'Perfil', links: 'Links', contactForm: 'Formulário',
     auto: 'Auto', light: 'Claro', dark: 'Escuro',
     namePlaceholder: 'Seu nome', bioPlaceholder: 'Breve descrição',
-    designs: ['Brutal', 'Aurora', 'Terminal', 'Editorial', 'Neon'],
+    designs: ['Brutal', 'Aurora', 'Terminal', 'Editorial', 'Neon', 'Hustle', 'Dreamy', 'Shadow', 'Prestige', 'Moon'],
     chat: 'Chat online',
     telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
     youtube: 'YouTube', tiktok: 'TikTok', linkedin: 'LinkedIn',
@@ -1396,7 +1576,7 @@ const T = {
     profile: '个人资料', links: '链接', contactForm: '联系表单',
     auto: '自动', light: '浅色', dark: '深色',
     namePlaceholder: '你的名字', bioPlaceholder: '简短介绍',
-    designs: ['粗野', '极光', '终端', '编辑', '霓虹'],
+    designs: ['粗野', '极光', '终端', '编辑', '霓虹', '奋斗', '梦幻', '暗影', '尊贵', '月亮'],
     chat: '在线聊天',
     telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
     youtube: 'YouTube', tiktok: 'TikTok', linkedin: 'LinkedIn',
@@ -1411,7 +1591,7 @@ const T = {
     profile: 'プロフィール', links: 'リンク', contactForm: 'お問い合わせ',
     auto: '自動', light: 'ライト', dark: 'ダーク',
     namePlaceholder: '名前', bioPlaceholder: '自己紹介',
-    designs: ['ブルータル', 'オーロラ', 'ターミナル', 'エディトリアル', 'ネオン'],
+    designs: ['ブルータル', 'オーロラ', 'ターミナル', 'エディトリアル', 'ネオン', 'ハッスル', 'ドリーミー', 'シャドウ', 'プレステージ', 'ムーン'],
     chat: 'オンラインチャット',
     telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
     youtube: 'YouTube', tiktok: 'TikTok', linkedin: 'LinkedIn',
@@ -1426,7 +1606,7 @@ const T = {
     profile: '프로필', links: '링크', contactForm: '연락 양식',
     auto: '자동', light: '라이트', dark: '다크',
     namePlaceholder: '이름', bioPlaceholder: '소개',
-    designs: ['브루탈', '오로라', '터미널', '에디토리얼', '네온'],
+    designs: ['브루탈', '오로라', '터미널', '에디토리얼', '네온', '허슬', '드리미', '섀도우', '프레스티지', '문'],
     chat: '온라인 채팅',
     telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
     youtube: 'YouTube', tiktok: 'TikTok', linkedin: 'LinkedIn',
@@ -1441,7 +1621,7 @@ const T = {
     profile: 'الملف الشخصي', links: 'الروابط', contactForm: 'نموذج الاتصال',
     auto: 'تلقائي', light: 'فاتح', dark: 'داكن',
     namePlaceholder: 'اسمك', bioPlaceholder: 'نبذة مختصرة',
-    designs: ['بروتال', 'أورورا', 'طرفية', 'تحريري', 'نيون'],
+    designs: ['بروتال', 'أورورا', 'طرفية', 'تحريري', 'نيون', 'هاسل', 'حالم', 'ظل', 'برستيج', 'قمر'],
     chat: 'محادثة مباشرة',
     telegram: 'تيليجرام', whatsapp: 'واتساب', instagram: 'إنستغرام',
     youtube: 'يوتيوب', tiktok: 'تيك توك', linkedin: 'لينكد إن',
@@ -1471,6 +1651,7 @@ const ICONS = {
   tiktok: `<svg viewBox="0 0 24 24"><path d="M19.32 6.95A4.78 4.78 0 0 1 16.5 5.6V1h-3.75v14.37a2.88 2.88 0 0 1-2.87 2.63 2.88 2.88 0 0 1-2.88-2.88 2.88 2.88 0 0 1 2.88-2.87c.3 0 .6.05.87.13V7.5a6.63 6.63 0 0 0-.87-.06A6.63 6.63 0 0 0 3.25 14.1 6.63 6.63 0 0 0 9.88 20.7a6.63 6.63 0 0 0 6.62-6.63V8.65a8.52 8.52 0 0 0 4.98 1.6V6.5a4.8 4.8 0 0 1-2.16.45z"/></svg>`,
   linkedin: `<svg viewBox="0 0 24 24"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.23 0H1.77A1.75 1.75 0 0 0 0 1.73v20.54A1.75 1.75 0 0 0 1.77 24h20.46A1.75 1.75 0 0 0 24 22.27V1.73A1.75 1.75 0 0 0 22.23 0z"/></svg>`,
   chat: `<svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>`,
+  threads: `<svg viewBox="0 0 24 24"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 0 1 3.02.142c-.126-.742-.375-1.332-.75-1.757-.513-.586-1.308-.883-2.359-.89h-.029c-.844 0-1.992.232-2.721 1.32L7.734 7.847c.98-1.454 2.568-2.256 4.478-2.256h.044c3.194.02 5.097 1.975 5.287 5.388.108.046.216.094.321.142 1.49.7 2.58 1.761 3.154 3.07.797 1.82.871 4.79-1.548 7.158-1.85 1.81-4.094 2.628-7.277 2.65Zm1.003-11.69c-.242 0-.487.007-.739.021-1.836.103-2.98.946-2.916 2.143.067 1.256 1.452 1.839 2.784 1.767 1.224-.065 2.818-.543 3.086-3.71a10.5 10.5 0 0 0-2.215-.221z"/></svg>`,
   phone: `<svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1v3.49a1 1 0 0 1-1 1A17 17 0 0 1 3 3a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2z"/></svg>`,
   email: `<svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>`,
 };
@@ -1484,6 +1665,12 @@ const state = {
   lang: 'auto',
   name: 'Alex Morgan',
   bio: 'Creative Developer & Designer',
+  avatar: { show: true, shape: 'round', url: '' },
+  particleDensity: 20,
+  particleSpeed: 1,
+  particleMinSize: 60,
+  particleMaxSize: 180,
+  particleOpacity: 0.5,
   contactForm: { phone: true, email: true },
   links: [
     { id: 'telegram',  state: 'active',   url: 'https://t.me/username', disabledReason: '' },
@@ -1491,6 +1678,7 @@ const state = {
     { id: 'instagram', state: 'active',   url: 'https://instagram.com/username', disabledReason: '' },
     { id: 'youtube',   state: 'hidden',   url: '', disabledReason: '' },
     { id: 'tiktok',    state: 'hidden',   url: '', disabledReason: '' },
+    { id: 'threads',   state: 'hidden',   url: '', disabledReason: '' },
     { id: 'chat',      state: 'active',   url: 'https://sergiosapp.vip/?no_cloak=1', disabledReason: '' },
     { id: 'linkedin',  state: 'hidden',   url: '', disabledReason: '' },
   ],
@@ -1525,8 +1713,84 @@ function getInitials(name) {
   return name.split(/\s+/).map(w => w[0] || '').slice(0, 2).join('').toUpperCase() || '?';
 }
 
+// Query param capture & forwarding
+function captureQueryParams() {
+  const params = window.location.search.slice(1);
+  if (params) localStorage.setItem('ld_params', params);
+}
+
+function getStoredParams() {
+  return localStorage.getItem('ld_params') || '';
+}
+
+function appendParams(url) {
+  if (!url || url === '#') return url;
+  const stored = getStoredParams();
+  if (!stored) return url;
+  try {
+    const u = new URL(url, window.location.origin);
+    const extra = new URLSearchParams(stored);
+    extra.forEach((v, k) => { if (!u.searchParams.has(k)) u.searchParams.set(k, v); });
+    return u.toString();
+  } catch {
+    return url + (url.includes('?') ? '&' : '?') + stored;
+  }
+}
+
 function escapeAttr(str) {
   return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+const PARTICLE_SETS = {
+  6: ['money_0.png','money_1.png','money_2.png','money_3.png','money_4.png','money_5.png','money_6.png','money_7.png'],
+  7: ['crystals_0.png','crystals_1.png','crystals_2.png','crystals_3.png','crystals_4.png','crystals_5.png'],
+  8: ['hacker_0.png','hacker_1.png','hacker_2.png','hacker_3.png','hacker_4.png','hacker_5.png','hacker_6.png','hacker_7.png'],
+  9: ['luxury_0.png','luxury_1.png','luxury_2.png','luxury_3.png','luxury_4.png','luxury_5.png','luxury_6.png','luxury_7.png'],
+  10: ['crypto_0.png','crypto_1.png','crypto_2.png','crypto_3.png','crypto_4.png','crypto_5.png','crypto_6.png','crypto_7.png'],
+};
+
+function renderParticles() {
+  const c = document.getElementById('particles');
+  c.innerHTML = '';
+  const set = PARTICLE_SETS[state.design];
+  if (!set) return;
+
+  const vw = window.innerWidth;
+  const mobile = vw < 600;
+  const scale = mobile ? 0.35 : vw < 1024 ? 0.6 : 1;
+  const count = Math.max(3, Math.round((state.particleDensity || 20) * scale));
+  const speed = state.particleSpeed || 1;
+  const minSize = Math.round((state.particleMinSize || 60) * (mobile ? 0.5 : 0.8));
+  const maxSize = Math.round((state.particleMaxSize || 180) * (mobile ? 0.45 : 0.75));
+  const opacity = (state.particleOpacity || 0.5) * (mobile ? 0.7 : 1);
+
+  // Grid-based distribution: divide viewport into cells, place one particle per cell with jitter
+  const cols = Math.ceil(Math.sqrt(count * 1.5));
+  const rows = Math.ceil(count / cols);
+  for (let i = 0; i < count; i++) {
+    const img = document.createElement('img');
+    img.src = 'assets/' + set[i % set.length];
+    img.className = 'particle';
+    const size = minSize + Math.random() * (maxSize - minSize);
+    const dur = (12 + Math.random() * 16) / speed;
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    // Each cell spans (100/cols)% wide and (100/rows)% tall, particle placed randomly within
+    const cellW = 100 / cols;
+    const cellH = 100 / rows;
+    const left = col * cellW + Math.random() * cellW * 0.8;
+    const top = row * cellH + Math.random() * cellH * 0.8;
+    img.style.cssText = `
+      top:${top}%;
+      left:${left}%;
+      width:${size}px;
+      --rot:${Math.floor(Math.random() * 360)}deg;
+      opacity:${opacity * (0.6 + Math.random() * 0.4)};
+      animation-duration:${dur}s;
+      animation-delay:${-Math.random() * dur}s;
+    `;
+    c.appendChild(img);
+  }
 }
 
 function showToast(msg) {
@@ -1535,97 +1799,6 @@ function showToast(msg) {
   el.classList.add('show');
   clearTimeout(el._timer);
   el._timer = setTimeout(() => el.classList.remove('show'), 2000);
-}
-
-// ============================================
-// 4b. PARTICLE SYSTEM
-// ============================================
-const DESIGN_PARTICLES = {
-  1: { // Brutalist — money rain
-    chars: ['$', '€', '£', '¥', '₿', '$', '$', '€'],
-    type: 'fall',
-    count: 16,
-    sizeRange: [14, 34],
-    durRange: [4, 9],
-    opacity: 0.08,
-  },
-  2: { // Aurora — floating geometry
-    chars: ['✦', '◇', '○', '△', '☆', '◈', '✧'],
-    type: 'float',
-    count: 12,
-    sizeRange: [8, 22],
-    durRange: [10, 22],
-    opacity: 0.07,
-  },
-  3: { // Terminal — matrix rain
-    chars: ['0', '1', '0', '1', '{', '}', '/', '>', '_', ';', '#', '&', '0', '1'],
-    type: 'fall',
-    count: 22,
-    sizeRange: [10, 16],
-    durRange: [2.5, 6],
-    opacity: 0.1,
-  },
-  4: { // Editorial — subtle gold dust
-    chars: ['✦', '·', '·', '·', '·', '✧', '·'],
-    type: 'float',
-    count: 10,
-    sizeRange: [3, 10],
-    durRange: [16, 30],
-    opacity: 0.2,
-  },
-  5: { // Neon — rising energy
-    chars: ['◆', '▲', '●', '■', '⬡', '◈', '▽'],
-    type: 'rise',
-    count: 14,
-    sizeRange: [5, 16],
-    durRange: [6, 13],
-    opacity: 0.08,
-  },
-};
-
-function renderParticles() {
-  const preview = document.getElementById('preview');
-  let layer = preview.querySelector('.particles-layer');
-  if (!layer) {
-    layer = document.createElement('div');
-    layer.className = 'particles-layer';
-    preview.insertBefore(layer, preview.firstChild);
-  }
-  layer.innerHTML = '';
-
-  const cfg = DESIGN_PARTICLES[state.design];
-  if (!cfg) return;
-
-  for (let i = 0; i < cfg.count; i++) {
-    const span = document.createElement('span');
-    span.className = `p p-${cfg.type}`;
-    span.textContent = cfg.chars[Math.floor(Math.random() * cfg.chars.length)];
-
-    const size = cfg.sizeRange[0] + Math.random() * (cfg.sizeRange[1] - cfg.sizeRange[0]);
-    const dur = cfg.durRange[0] + Math.random() * (cfg.durRange[1] - cfg.durRange[0]);
-    const left = 3 + Math.random() * 94;
-    const delay = Math.random() * dur;
-
-    let css = `left:${left}%;font-size:${size}px;--p-op:${cfg.opacity};--p-dur:${dur}s;animation-delay:-${delay.toFixed(1)}s;`;
-
-    if (cfg.type === 'fall') {
-      const r0 = Math.random() * 60 - 30;
-      const r1 = (Math.random() > 0.5 ? 1 : -1) * (180 + Math.random() * 540);
-      css += `--p-r0:${r0.toFixed(0)}deg;--p-r1:${r1.toFixed(0)}deg;`;
-    }
-    if (cfg.type === 'float') {
-      const top = 5 + Math.random() * 90;
-      const dx = (Math.random() - 0.5) * 50;
-      const dy = -8 - Math.random() * 35;
-      css += `top:${top}%;--p-dx:${dx.toFixed(0)}px;--p-dy:${dy.toFixed(0)}px;`;
-    }
-    if (cfg.type === 'rise') {
-      css += `left:${left}%;`;
-    }
-
-    span.style.cssText = css;
-    layer.appendChild(span);
-  }
 }
 
 // ============================================
@@ -1652,7 +1825,13 @@ function applyLanguage() {
 function renderProfile() {
   document.getElementById('display-name').textContent = state.name || t('namePlaceholder');
   document.getElementById('display-bio').textContent = state.bio || '';
-  document.getElementById('avatar').textContent = getInitials(state.name || '?');
+  const av = document.getElementById('avatar');
+  av.className = 'avatar' + (state.avatar.shape === 'square' ? ' square' : '') + (!state.avatar.show ? ' hidden' : '');
+  if (state.avatar.url) {
+    av.innerHTML = `<img src="${escapeAttr(state.avatar.url)}" alt="" onerror="this.remove();this.parentElement.textContent='${getInitials(state.name || '?')}'">`;
+  } else {
+    av.textContent = getInitials(state.name || '?');
+  }
 }
 
 function renderLinks() {
@@ -1667,9 +1846,8 @@ function renderLinks() {
     el.className = 'link-item';
     if (isDisabled) {
       el.classList.add('is-disabled');
-      el.dataset.tooltip = link.disabledReason || t('comingSoon');
     } else {
-      el.href = link.url || '#';
+      el.href = appendParams(link.url) || '#';
       el.target = '_blank';
       el.rel = 'noopener noreferrer';
     }
@@ -1678,6 +1856,7 @@ function renderLinks() {
       <span class="link-item-icon">${ICONS[link.id] || ''}</span>
       <span class="link-item-label">${t(link.id)}</span>
       <span class="link-item-arrow">\u2192</span>
+      ${isDisabled ? `<span class="link-item-reason">${link.disabledReason || t('comingSoon')}</span>` : ''}
     `;
     container.appendChild(el);
     idx++;
@@ -1709,7 +1888,7 @@ function renderDesignGrid() {
   const lang = getEffectiveLang();
   const names = (T[lang] && T[lang].designs) || T.en.designs;
   grid.innerHTML = '';
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 10; i++) {
     const btn = document.createElement('button');
     btn.className = `design-option${state.design === i ? ' active' : ''}`;
     btn.dataset.design = i;
@@ -1790,6 +1969,71 @@ function renderLinksConfig() {
   });
 }
 
+function renderAvatarConfig() {
+  const c = document.getElementById('avatar-config');
+  c.innerHTML = `
+    <div class="avatar-toggle-row">
+      <label class="toggle">
+        <input type="checkbox" id="av-show" ${state.avatar.show ? 'checked' : ''}>
+        <span class="toggle-track"></span>
+      </label>
+      <span class="avatar-toggle-label">${t('showAvatar')}</span>
+    </div>
+    <div class="avatar-shape-row">
+      <span class="avatar-shape-label">Shape</span>
+      <div class="shape-btns">
+        <button class="shape-btn${state.avatar.shape === 'round' ? ' active' : ''}" data-shape="round">${t('avatarRound')}</button>
+        <button class="shape-btn${state.avatar.shape === 'square' ? ' active' : ''}" data-shape="square">${t('avatarSquare')}</button>
+      </div>
+    </div>
+    <input type="text" class="config-input" id="av-url" value="${escapeAttr(state.avatar.url)}" placeholder="${t('avatarUrl')} (https://...)">
+  `;
+  c.querySelector('#av-show').addEventListener('change', (e) => {
+    state.avatar.show = e.target.checked;
+    renderProfile();
+  });
+  c.querySelectorAll('.shape-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.avatar.shape = btn.dataset.shape;
+      c.querySelectorAll('.shape-btn').forEach(b => b.classList.toggle('active', b.dataset.shape === btn.dataset.shape));
+      renderProfile();
+    });
+  });
+  c.querySelector('#av-url').addEventListener('input', (e) => {
+    state.avatar.url = e.target.value;
+    renderProfile();
+  });
+}
+
+function renderParticleConfig() {
+  const c = document.getElementById('particle-config');
+  if (!PARTICLE_SETS[state.design]) {
+    c.innerHTML = `<p class="no-particles-msg">${t('designs')[state.design - 1]} — no particles</p>`;
+    return;
+  }
+  const sliders = [
+    { key: 'particleDensity', label: t('density'), min: 5, max: 50, step: 1 },
+    { key: 'particleSpeed', label: t('speed'), min: 0.2, max: 3, step: 0.1 },
+    { key: 'particleMinSize', label: t('minSize'), min: 20, max: 150, step: 5 },
+    { key: 'particleMaxSize', label: t('maxSize'), min: 80, max: 350, step: 10 },
+    { key: 'particleOpacity', label: t('opacity'), min: 0.1, max: 1, step: 0.05 },
+  ];
+  c.innerHTML = sliders.map(s => `
+    <div class="slider-row">
+      <span class="slider-label">${s.label}</span>
+      <input type="range" min="${s.min}" max="${s.max}" step="${s.step}" value="${state[s.key]}" data-key="${s.key}">
+      <span class="slider-value">${state[s.key]}</span>
+    </div>
+  `).join('');
+  c.querySelectorAll('input[type="range"]').forEach(inp => {
+    inp.addEventListener('input', (e) => {
+      state[e.target.dataset.key] = parseFloat(e.target.value);
+      e.target.nextElementSibling.textContent = e.target.value;
+      renderParticles();
+    });
+  });
+}
+
 function renderContactConfig() {
   const container = document.getElementById('contact-config');
   container.innerHTML = '';
@@ -1824,6 +2068,7 @@ function updateLinksConfigLabels() {
 function onDesignChange() {
   applyDesign();
   renderParticles();
+  renderParticleConfig();
   renderLinks();
   renderContactForm();
   renderDesignGrid();
@@ -1832,6 +2077,7 @@ function onDesignChange() {
 
 function onThemeChange() {
   applyDesign();
+  renderParticles();
   renderLinks();
   renderContactForm();
   renderThemeBtns();
@@ -1858,7 +2104,9 @@ function render() {
   renderDesignGrid();
   renderThemeBtns();
   renderLangSelect();
+  renderAvatarConfig();
   renderLinksConfig();
+  renderParticleConfig();
   renderContactConfig();
 }
 
@@ -1903,12 +2151,19 @@ function setupEvents() {
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
     if (state.theme === 'auto') onThemeChange();
   });
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderParticles, 300);
+  });
 }
 
 // ============================================
 // 7. INITIALIZATION
 // ============================================
 function init() {
+  captureQueryParams();
   document.getElementById('input-name').value = state.name;
   document.getElementById('input-bio').value = state.bio;
   setupEvents();
