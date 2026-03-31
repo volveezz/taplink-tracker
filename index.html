@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LinkDrop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700&family=VT323&family=Fira+Code:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+/* ============================================
+   1. RESET & BASE
+   ============================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { height: 100%; -webkit-text-size-adjust: 100%; }
+body {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Outfit', system-ui, sans-serif;
+  background: #111;
+  transition: background-color 0.5s ease;
+}
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+input, select { font: inherit; color: inherit; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+/* ============================================
+   2. APP LAYOUT
+   ============================================ */
+#app {
+  display: flex;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ============================================
+   3. SETTINGS BUTTON
+   ============================================ */
+#settings-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(20, 20, 25, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+#settings-btn:hover {
+  background: rgba(30, 30, 35, 0.95);
+  transform: rotate(45deg) scale(1.05);
+}
+#settings-btn svg {
+  width: 22px;
+  height: 22px;
+  fill: rgba(255,255,255,0.8);
+}
+#settings-btn.panel-open { opacity: 0; pointer-events: none; }
+
+/* ============================================
+   4. CONFIG PANEL
+   ============================================ */
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 900;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+#overlay.open { opacity: 1; pointer-events: auto; }
+
+#config-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 380px;
+  height: 100vh;
+  background: rgba(12, 12, 18, 0.97);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-left: 1px solid rgba(255,255,255,0.06);
+  z-index: 1001;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  color: #d0d0d0;
+}
+#config-panel.open { transform: translateX(0); }
+
+.config-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.config-header h2 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+#config-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 18px;
+  color: #888;
+}
+#config-close:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+.config-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+.config-section {
+  padding: 20px 28px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.config-section:last-child { border-bottom: none; }
+.config-section h3 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #666;
+  margin-bottom: 14px;
+}
+
+/* Design selector */
+.design-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.design-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+.design-option:hover { background: rgba(255,255,255,0.04); }
+.design-option.active { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.06); }
+.design-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.design-swatch-1 { background: #FFE600; border: 2px solid #000; }
+.design-swatch-2 { background: linear-gradient(135deg, #7c5bf5, #00c9c9, #ff5090); }
+.design-swatch-3 { background: #0c0c0c; border: 1px solid #00ff41; }
+.design-swatch-3::after { content: '>_'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #00ff41; font-family: 'VT323'; font-size: 14px; }
+.design-swatch-4 { background: #f8f4ef; border: 1px solid #c4935a; }
+.design-swatch-4::after { content: 'Aa'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #1a1a1a; font-family: 'Playfair Display'; font-size: 13px; font-weight: 700; }
+.design-swatch-5 { background: #0a0a14; box-shadow: inset 0 0 8px rgba(0,240,255,0.4), inset 0 0 8px rgba(255,0,255,0.3); }
+.design-option span:last-child {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+/* Theme selector */
+.theme-btns {
+  display: flex;
+  gap: 6px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  padding: 4px;
+}
+.theme-btn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.2s ease;
+  color: #888;
+}
+.theme-btn:hover { color: #bbb; }
+.theme-btn.active { background: rgba(255,255,255,0.1); color: #fff; }
+
+/* Language select */
+.lang-select {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  color: #d0d0d0;
+  font-size: 14px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  cursor: pointer;
+}
+.lang-select option { background: #1a1a20; color: #d0d0d0; }
+
+/* Profile inputs */
+.profile-inputs { display: flex; flex-direction: column; gap: 10px; }
+.config-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  color: #d0d0d0;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+.config-input:focus { outline: none; border-color: rgba(255,255,255,0.2); }
+.config-input::placeholder { color: #555; }
+
+/* Link toggles */
+.links-config { display: flex; flex-direction: column; gap: 2px; }
+.link-config-item {
+  padding: 10px 12px;
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+.link-config-item:hover { background: rgba(255,255,255,0.03); }
+.link-config-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.link-config-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.link-config-icon svg { width: 18px; height: 18px; fill: #888; }
+.link-config-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+}
+.link-url-input {
+  width: 100%;
+  margin-top: 8px;
+  padding: 7px 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  color: #999;
+  font-size: 12px;
+  font-family: 'Fira Code', monospace;
+  transition: all 0.2s ease;
+}
+.link-url-input:focus { outline: none; border-color: rgba(255,255,255,0.15); color: #d0d0d0; }
+
+/* Toggle switch */
+.toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.1);
+  border-radius: 11px;
+  transition: background 0.25s ease;
+  cursor: pointer;
+}
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  background: #555;
+  border-radius: 50%;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.toggle input:checked + .toggle-track { background: rgba(100,200,130,0.3); }
+.toggle input:checked + .toggle-track::after { transform: translateX(18px); background: #5bd97a; }
+
+/* ============================================
+   5. PREVIEW CONTAINER
+   ============================================ */
+#preview {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 40px 20px;
+  transition: background 0.6s ease;
+  position: relative;
+}
+
+.preview-inner {
+  width: 100%;
+  max-width: 420px;
+  min-height: 500px;
+  position: relative;
+  z-index: 1;
+  padding: 48px 28px 40px;
+  transition: all 0.5s ease;
+}
+
+/* ============================================
+   6. PROFILE SECTION
+   ============================================ */
+.profile-section {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.avatar {
+  width: var(--avatar-size, 88px);
+  height: var(--avatar-size, 88px);
+  border-radius: 50%;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 28px;
+  transition: all 0.5s ease;
+  position: relative;
+  overflow: hidden;
+}
+.profile-name {
+  font-family: var(--font-heading, 'Outfit');
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+  margin-bottom: 6px;
+  transition: all 0.5s ease;
+  line-height: 1.2;
+}
+.profile-bio {
+  font-family: var(--font-body, 'Outfit');
+  font-size: 15px;
+  color: var(--text-secondary, rgba(255,255,255,0.6));
+  font-weight: 400;
+  line-height: 1.5;
+  transition: all 0.5s ease;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   7. LINK ITEMS
+   ============================================ */
+.links-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.link-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 20px;
+  background: var(--link-bg);
+  color: var(--link-text, #fff);
+  border: var(--link-border, none);
+  border-radius: var(--link-radius, 12px);
+  box-shadow: var(--link-shadow, none);
+  font-family: var(--font-body, 'Outfit');
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.link-item-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.link-item-icon svg { width: 20px; height: 20px; fill: currentColor; }
+.link-item-label { flex: 1; }
+.link-item-arrow {
+  opacity: 0.4;
+  font-size: 18px;
+  transition: all 0.3s ease;
+}
+
+/* Entry animation */
+.link-item { animation: linkEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+.link-item:nth-child(1) { animation-delay: 0.05s; }
+.link-item:nth-child(2) { animation-delay: 0.1s; }
+.link-item:nth-child(3) { animation-delay: 0.15s; }
+.link-item:nth-child(4) { animation-delay: 0.2s; }
+.link-item:nth-child(5) { animation-delay: 0.25s; }
+.link-item:nth-child(6) { animation-delay: 0.3s; }
+.link-item:nth-child(7) { animation-delay: 0.35s; }
+.link-item:nth-child(8) { animation-delay: 0.4s; }
+.link-item:nth-child(9) { animation-delay: 0.45s; }
+
+.profile-section { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+
+/* ============================================
+   8. DESIGN 1 — BRUTALIST
+   ============================================ */
+body.design-1 {
+  --font-heading: 'Archivo Black', sans-serif;
+  --font-body: 'Space Mono', monospace;
+  --text-primary: #000;
+  --text-secondary: #333;
+  --link-bg: #fff;
+  --link-text: #000;
+  --link-border: 3px solid #000;
+  --link-radius: 0px;
+  --link-shadow: 5px 5px 0 #000;
+  --avatar-size: 90px;
+}
+body.design-1 #preview { background: #FFE600; }
+body.design-1 .preview-inner { padding: 48px 24px; }
+body.design-1 .avatar {
+  background: #FF2D6B;
+  color: #fff;
+  border: 3px solid #000;
+  box-shadow: 4px 4px 0 #000;
+  border-radius: 0;
+  font-family: 'Archivo Black', sans-serif;
+}
+body.design-1 .profile-name {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 28px;
+}
+body.design-1 .profile-bio {
+  font-size: 13px;
+  letter-spacing: 0.01em;
+}
+body.design-1 .link-item:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 8px 8px 0 #000;
+}
+body.design-1 .link-item:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #000;
+}
+body.design-1 .link-item-label {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+}
+body.design-1 .link-item-arrow { font-weight: 700; }
+body.design-1 .links-section { gap: 10px; }
+
+/* Brutalist dark */
+body.design-1.dark #preview { background: #111; }
+body.design-1.dark { --text-primary: #FFE600; --text-secondary: #ccc; --link-bg: #1a1a1a; --link-text: #FFE600; --link-border: 3px solid #FFE600; --link-shadow: 5px 5px 0 #FFE600; }
+body.design-1.dark .avatar { background: #FF2D6B; border-color: #FFE600; box-shadow: 4px 4px 0 #FFE600; }
+body.design-1.dark .link-item:hover { box-shadow: 8px 8px 0 #FFE600; }
+body.design-1.dark .link-item:active { box-shadow: 2px 2px 0 #FFE600; }
+
+/* ============================================
+   9. DESIGN 2 — AURORA
+   ============================================ */
+body.design-2 {
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+  --text-primary: #fff;
+  --text-secondary: rgba(255,255,255,0.65);
+  --link-bg: rgba(255,255,255,0.07);
+  --link-text: #fff;
+  --link-border: 1px solid rgba(255,255,255,0.1);
+  --link-radius: 16px;
+  --link-shadow: none;
+  --avatar-size: 92px;
+}
+body.design-2 #preview {
+  background: #070720;
+}
+body.design-2 #preview::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 40%, rgba(120,50,255,0.35) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 80% at 75% 20%, rgba(0,200,190,0.25) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 50% at 60% 85%, rgba(255,50,130,0.2) 0%, transparent 70%);
+  animation: auroraShift 20s ease-in-out infinite alternate;
+  z-index: 0;
+}
+body.design-2 .preview-inner { z-index: 1; }
+body.design-2 .avatar {
+  background: linear-gradient(135deg, rgba(120,80,255,0.4), rgba(0,200,200,0.3));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 300;
+  font-size: 32px;
+}
+body.design-2 .profile-name { font-weight: 600; font-size: 26px; }
+body.design-2 .profile-bio { font-weight: 300; font-size: 15px; }
+body.design-2 .link-item {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+body.design-2 .link-item:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(120,80,255,0.15);
+}
+body.design-2 .link-item-arrow { opacity: 0.3; }
+
+/* Aurora light */
+body.design-2.light #preview { background: #f0ecf8; }
+body.design-2.light #preview::before {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 40%, rgba(120,50,255,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 80% at 75% 20%, rgba(0,200,190,0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 50% at 60% 85%, rgba(255,50,130,0.08) 0%, transparent 70%);
+}
+body.design-2.light { --text-primary: #1a1030; --text-secondary: #6b5e80; --link-bg: rgba(255,255,255,0.6); --link-text: #1a1030; --link-border: 1px solid rgba(100,60,200,0.12); }
+body.design-2.light .avatar { background: linear-gradient(135deg, rgba(120,80,255,0.2), rgba(0,200,200,0.15)); border-color: rgba(100,60,200,0.2); color: #3a2060; }
+body.design-2.light .link-item { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+body.design-2.light .link-item:hover { background: rgba(255,255,255,0.8); box-shadow: 0 8px 32px rgba(120,80,255,0.1); }
+
+/* ============================================
+   10. DESIGN 3 — TERMINAL
+   ============================================ */
+body.design-3 {
+  --font-heading: 'VT323', monospace;
+  --font-body: 'Fira Code', 'VT323', monospace;
+  --text-primary: #00ff41;
+  --text-secondary: #00cc33;
+  --link-bg: transparent;
+  --link-text: #00ff41;
+  --link-border: 1px solid rgba(0,255,65,0.25);
+  --link-radius: 0;
+  --link-shadow: none;
+  --avatar-size: 0px;
+}
+body.design-3 #preview { background: #0a0a0a; }
+body.design-3 #preview::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
+  pointer-events: none;
+  z-index: 2;
+}
+body.design-3 .preview-inner {
+  z-index: 1;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(0,255,65,0.2);
+  padding: 0;
+  font-family: 'Fira Code', monospace;
+}
+.terminal-bar {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(0,255,65,0.06);
+  border-bottom: 1px solid rgba(0,255,65,0.15);
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+  color: #00ff41;
+}
+body.design-3 .terminal-bar { display: flex; }
+.terminal-dots { display: flex; gap: 6px; }
+.terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,255,65,0.4);
+}
+.terminal-dot:nth-child(1) { background: rgba(255,95,87,0.8); border-color: rgba(255,95,87,0.5); }
+.terminal-dot:nth-child(2) { background: rgba(255,189,46,0.8); border-color: rgba(255,189,46,0.5); }
+.terminal-dot:nth-child(3) { background: rgba(39,201,63,0.8); border-color: rgba(39,201,63,0.5); }
+.terminal-title { flex: 1; text-align: center; opacity: 0.6; font-size: 13px; }
+
+body.design-3 .profile-section {
+  text-align: left;
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid rgba(0,255,65,0.1);
+}
+body.design-3 .avatar { display: none; }
+body.design-3 .profile-name {
+  font-size: 20px;
+  font-weight: 400;
+  text-transform: none;
+}
+body.design-3 .profile-name::before { content: '$ whoami → '; opacity: 0.5; font-size: 16px; }
+body.design-3 .profile-bio {
+  font-size: 13px;
+  margin-top: 4px;
+  max-width: 100%;
+}
+body.design-3 .profile-bio::before { content: '# '; opacity: 0.4; }
+body.design-3 .links-section { padding: 16px 20px 24px; gap: 4px; }
+body.design-3 .link-item {
+  padding: 10px 12px;
+  font-size: 14px;
+  gap: 10px;
+  border: none;
+  border-left: 2px solid transparent;
+}
+body.design-3 .link-item:hover {
+  background: rgba(0,255,65,0.06);
+  border-left-color: #00ff41;
+  text-shadow: 0 0 8px rgba(0,255,65,0.5);
+}
+body.design-3 .link-item-icon svg { width: 16px; height: 16px; }
+body.design-3 .link-item-label { font-family: 'Fira Code', monospace; font-size: 13px; font-weight: 400; }
+body.design-3 .link-item-arrow { font-family: 'VT323'; font-size: 20px; opacity: 0.3; }
+body.design-3 .link-item:hover .link-item-arrow { opacity: 0.8; }
+
+/* Terminal cursor blink */
+.terminal-cursor {
+  display: none;
+  padding: 4px 20px 20px;
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  color: #00ff41;
+}
+body.design-3 .terminal-cursor { display: block; }
+.terminal-cursor::after {
+  content: '█';
+  animation: blink 1s step-end infinite;
+}
+
+/* Terminal light (rare but supported) */
+body.design-3.light #preview { background: #f4f4f0; }
+body.design-3.light #preview::after { background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); }
+body.design-3.light { --text-primary: #0a5f20; --text-secondary: #0a5f20; --link-text: #0a5f20; }
+body.design-3.light .preview-inner { background: rgba(255,255,255,0.6); border-color: rgba(10,95,32,0.2); }
+body.design-3.light .terminal-bar { color: #0a5f20; background: rgba(10,95,32,0.04); border-color: rgba(10,95,32,0.1); }
+body.design-3.light .link-item:hover { background: rgba(10,95,32,0.06); border-left-color: #0a5f20; text-shadow: none; }
+body.design-3.light .terminal-cursor { color: #0a5f20; }
+
+/* ============================================
+   11. DESIGN 4 — EDITORIAL
+   ============================================ */
+body.design-4 {
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Cormorant Garamond', serif;
+  --text-primary: #1a1a1a;
+  --text-secondary: #7a6e60;
+  --link-bg: transparent;
+  --link-text: #1a1a1a;
+  --link-border: none;
+  --link-radius: 0;
+  --link-shadow: none;
+  --avatar-size: 80px;
+}
+body.design-4 #preview { background: #f8f4ef; }
+body.design-4 .preview-inner { padding: 56px 32px 48px; }
+body.design-4 .avatar {
+  background: transparent;
+  border: 1.5px solid #c4935a;
+  color: #c4935a;
+  font-family: 'Playfair Display', serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 26px;
+}
+body.design-4 .profile-name {
+  font-size: 30px;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: -0.01em;
+}
+body.design-4 .profile-bio {
+  font-size: 17px;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  line-height: 1.6;
+}
+body.design-4 .profile-section { margin-bottom: 24px; }
+body.design-4 .profile-section::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: #c4935a;
+  margin: 24px auto 0;
+}
+body.design-4 .links-section { gap: 0; }
+body.design-4 .link-item {
+  padding: 18px 4px;
+  border-bottom: 1px solid rgba(180,160,130,0.2);
+  border-radius: 0;
+  gap: 16px;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+body.design-4 .link-item:first-child { border-top: 1px solid rgba(180,160,130,0.2); }
+body.design-4 .link-item:hover { background: rgba(196,147,90,0.05); }
+body.design-4 .link-item:hover .link-item-arrow {
+  opacity: 1;
+  transform: translateX(4px);
+}
+body.design-4 .link-item-icon svg { width: 18px; height: 18px; }
+body.design-4 .link-item-arrow {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  transition: all 0.35s ease;
+}
+
+/* Editorial dark */
+body.design-4.dark #preview { background: #1a1714; }
+body.design-4.dark { --text-primary: #e8e0d4; --text-secondary: #9a8e7e; --link-text: #e8e0d4; }
+body.design-4.dark .avatar { border-color: #c4935a; color: #c4935a; }
+body.design-4.dark .link-item { border-color: rgba(196,147,90,0.15); }
+body.design-4.dark .link-item:first-child { border-top-color: rgba(196,147,90,0.15); }
+body.design-4.dark .link-item:hover { background: rgba(196,147,90,0.06); }
+
+/* ============================================
+   12. DESIGN 5 — NEON CYBER
+   ============================================ */
+body.design-5 {
+  --font-heading: 'Orbitron', sans-serif;
+  --font-body: 'Rajdhani', sans-serif;
+  --text-primary: #ffffff;
+  --text-secondary: #7788aa;
+  --accent: #00f0ff;
+  --accent-2: #ff00ff;
+  --link-bg: rgba(0,240,255,0.04);
+  --link-text: #e0f0ff;
+  --link-border: 1px solid rgba(0,240,255,0.2);
+  --link-radius: 4px;
+  --link-shadow: none;
+  --avatar-size: 88px;
+}
+body.design-5 #preview { background: #06060f; }
+body.design-5 #preview::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  z-index: 0;
+}
+body.design-5 #preview::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(ellipse at 30% 50%, rgba(0,240,255,0.06) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 50%, rgba(255,0,255,0.04) 0%, transparent 50%);
+  z-index: 0;
+  animation: neonDrift 12s ease-in-out infinite alternate;
+}
+body.design-5 .preview-inner { z-index: 1; }
+body.design-5 .avatar {
+  background: rgba(0,240,255,0.08);
+  border: 1px solid rgba(0,240,255,0.4);
+  color: #00f0ff;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+  box-shadow: 0 0 20px rgba(0,240,255,0.15), inset 0 0 20px rgba(0,240,255,0.05);
+}
+body.design-5 .profile-name {
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  background: linear-gradient(90deg, #00f0ff, #ff00ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+body.design-5 .profile-bio {
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+body.design-5 .links-section { gap: 8px; }
+body.design-5 .link-item {
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  font-size: 15px;
+}
+body.design-5 .link-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--link-radius);
+  opacity: 0;
+  background: linear-gradient(90deg, rgba(0,240,255,0.1), rgba(255,0,255,0.1));
+  transition: opacity 0.3s ease;
+}
+body.design-5 .link-item:hover::before { opacity: 1; }
+body.design-5 .link-item:hover {
+  border-color: rgba(0,240,255,0.5);
+  box-shadow: 0 0 15px rgba(0,240,255,0.15), 0 0 30px rgba(0,240,255,0.05);
+  transform: translateY(-1px);
+}
+body.design-5 .link-item-icon { color: #00f0ff; }
+body.design-5 .link-item-arrow { color: #ff00ff; opacity: 0.4; }
+body.design-5 .link-item:hover .link-item-arrow { opacity: 0.8; }
+
+/* Neon light (keeps dark vibe with lighter base) */
+body.design-5.light #preview { background: #e8eaf0; }
+body.design-5.light #preview::before { background-image: linear-gradient(rgba(0,100,120,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,100,120,0.06) 1px, transparent 1px); }
+body.design-5.light #preview::after { background: radial-gradient(ellipse at 30% 50%, rgba(0,180,200,0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 50%, rgba(180,0,200,0.06) 0%, transparent 50%); }
+body.design-5.light { --text-primary: #0a0a20; --text-secondary: #556688; --link-bg: rgba(0,180,200,0.06); --link-text: #0a0a20; --link-border: 1px solid rgba(0,180,200,0.2); }
+body.design-5.light .avatar { background: rgba(0,180,200,0.08); border-color: rgba(0,180,200,0.4); color: #006880; box-shadow: 0 0 20px rgba(0,180,200,0.1); }
+body.design-5.light .profile-name { background: linear-gradient(90deg, #006880, #800080); -webkit-background-clip: text; background-clip: text; }
+body.design-5.light .link-item-icon { color: #006880; }
+body.design-5.light .link-item:hover { border-color: rgba(0,180,200,0.5); box-shadow: 0 0 15px rgba(0,180,200,0.1); }
+
+/* ============================================
+   13. ANIMATIONS
+   ============================================ */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes linkEnter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes auroraShift {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.1) rotate(2deg); }
+  100% { transform: scale(1) rotate(-1deg); }
+}
+@keyframes neonDrift {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-5%, 3%); }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+@keyframes glitch {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1px, -1px); }
+  80% { transform: translate(1px, 1px); }
+}
+
+/* ============================================
+   14. RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  #config-panel { width: 100%; }
+  #settings-btn { top: 14px; right: 14px; width: 42px; height: 42px; border-radius: 12px; }
+  #preview { padding: 24px 12px; }
+  .preview-inner { padding: 36px 20px 32px; }
+  body.design-4 .preview-inner { padding: 40px 24px 36px; }
+  .profile-name { font-size: 22px !important; }
+  body.design-5 .profile-name { font-size: 18px !important; }
+  .link-item { padding: 13px 16px; font-size: 14px; }
+}
+@media (max-width: 380px) {
+  .preview-inner { padding: 28px 16px 24px; }
+  .design-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* RTL */
+html[dir="rtl"] .link-item { flex-direction: row-reverse; }
+html[dir="rtl"] .link-config-row { flex-direction: row-reverse; }
+html[dir="rtl"] .link-item-arrow { transform: scaleX(-1); }
+html[dir="rtl"] body.design-3 .profile-name::before { content: ' ← whoami $'; }
+html[dir="rtl"] body.design-3 .link-item { border-left: none; border-right: 2px solid transparent; }
+html[dir="rtl"] body.design-3 .link-item:hover { border-left-color: transparent; border-right-color: #00ff41; }
+  </style>
+</head>
+<body class="design-1">
+  <div id="app">
+
+    <!-- Settings Toggle -->
+    <button id="settings-btn" aria-label="Settings">
+      <svg viewBox="0 0 24 24"><path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97s-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.5.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1s.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.08.73 1.69.98l.38 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.38-2.65c.61-.25 1.17-.58 1.69-.98l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64L19.43 12.97Z"/></svg>
+    </button>
+
+    <!-- Overlay -->
+    <div id="overlay"></div>
+
+    <!-- Config Panel -->
+    <aside id="config-panel">
+      <div class="config-header">
+        <h2 data-i18n="settings">Settings</h2>
+        <button id="config-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="config-body">
+
+        <!-- Design -->
+        <div class="config-section">
+          <h3 data-i18n="design">Design</h3>
+          <div class="design-grid" id="design-grid"></div>
+        </div>
+
+        <!-- Theme -->
+        <div class="config-section">
+          <h3 data-i18n="theme">Theme</h3>
+          <div class="theme-btns" id="theme-btns"></div>
+        </div>
+
+        <!-- Language -->
+        <div class="config-section">
+          <h3 data-i18n="language">Language</h3>
+          <select class="lang-select" id="lang-select"></select>
+        </div>
+
+        <!-- Profile -->
+        <div class="config-section">
+          <h3 data-i18n="profile">Profile</h3>
+          <div class="profile-inputs">
+            <input type="text" class="config-input" id="input-name" data-i18n-placeholder="namePlaceholder">
+            <input type="text" class="config-input" id="input-bio" data-i18n-placeholder="bioPlaceholder">
+          </div>
+        </div>
+
+        <!-- Links -->
+        <div class="config-section">
+          <h3 data-i18n="links">Links</h3>
+          <div class="links-config" id="links-config"></div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- Preview -->
+    <main id="preview">
+      <div class="preview-inner">
+        <div class="terminal-bar">
+          <div class="terminal-dots"><span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span></div>
+          <span class="terminal-title">linkdrop — bash — 80×24</span>
+        </div>
+        <section class="profile-section">
+          <div class="avatar" id="avatar"></div>
+          <h1 class="profile-name" id="display-name"></h1>
+          <p class="profile-bio" id="display-bio"></p>
+        </section>
+        <section class="links-section" id="links-container"></section>
+        <div class="terminal-cursor"></div>
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+// ============================================
+// 1. TRANSLATIONS
+// ============================================
+const T = {
+  en: {
+    settings: 'Settings', design: 'Design', theme: 'Theme', language: 'Language',
+    profile: 'Profile', links: 'Links', auto: 'Auto', light: 'Light', dark: 'Dark',
+    namePlaceholder: 'Your name', bioPlaceholder: 'Short bio or tagline',
+    designs: ['Brutal', 'Aurora', 'Terminal', 'Editorial', 'Neon'],
+    phone: 'Phone', email: 'Email',
+    telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
+    youtube: 'YouTube', tiktok: 'TikTok', github: 'GitHub', linkedin: 'LinkedIn',
+  },
+  ru: {
+    settings: 'Настройки', design: 'Дизайн', theme: 'Тема', language: 'Язык',
+    profile: 'Профиль', links: 'Ссылки', auto: 'Авто', light: 'Светлая', dark: 'Тёмная',
+    namePlaceholder: 'Ваше имя', bioPlaceholder: 'Короткое описание',
+    designs: ['Брутал', 'Аврора', 'Терминал', 'Редакция', 'Неон'],
+    phone: 'Телефон', email: 'Почта',
+    telegram: 'Телеграм', whatsapp: 'Вотсап', instagram: 'Инстаграм',
+    youtube: 'Ютуб', tiktok: 'ТикТок', github: 'ГитХаб', linkedin: 'ЛинкедИн',
+  },
+  es: {
+    settings: 'Ajustes', design: 'Diseño', theme: 'Tema', language: 'Idioma',
+    profile: 'Perfil', links: 'Enlaces', auto: 'Auto', light: 'Claro', dark: 'Oscuro',
+    namePlaceholder: 'Tu nombre', bioPlaceholder: 'Breve descripción',
+    designs: ['Brutal', 'Aurora', 'Terminal', 'Editorial', 'Neón'],
+    phone: 'Teléfono', email: 'Correo',
+    telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
+    youtube: 'YouTube', tiktok: 'TikTok', github: 'GitHub', linkedin: 'LinkedIn',
+  },
+  de: {
+    settings: 'Einstellungen', design: 'Design', theme: 'Thema', language: 'Sprache',
+    profile: 'Profil', links: 'Links', auto: 'Auto', light: 'Hell', dark: 'Dunkel',
+    namePlaceholder: 'Dein Name', bioPlaceholder: 'Kurze Beschreibung',
+    designs: ['Brutal', 'Aurora', 'Terminal', 'Redaktion', 'Neon'],
+    phone: 'Telefon', email: 'E-Mail',
+    telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
+    youtube: 'YouTube', tiktok: 'TikTok', github: 'GitHub', linkedin: 'LinkedIn',
+  },
+  fr: {
+    settings: 'Paramètres', design: 'Design', theme: 'Thème', language: 'Langue',
+    profile: 'Profil', links: 'Liens', auto: 'Auto', light: 'Clair', dark: 'Sombre',
+    namePlaceholder: 'Votre nom', bioPlaceholder: 'Courte description',
+    designs: ['Brutal', 'Aurora', 'Terminal', 'Éditorial', 'Néon'],
+    phone: 'Téléphone', email: 'E-mail',
+    telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
+    youtube: 'YouTube', tiktok: 'TikTok', github: 'GitHub', linkedin: 'LinkedIn',
+  },
+  pt: {
+    settings: 'Configurações', design: 'Design', theme: 'Tema', language: 'Idioma',
+    profile: 'Perfil', links: 'Links', auto: 'Auto', light: 'Claro', dark: 'Escuro',
+    namePlaceholder: 'Seu nome', bioPlaceholder: 'Breve descrição',
+    designs: ['Brutal', 'Aurora', 'Terminal', 'Editorial', 'Neon'],
+    phone: 'Telefone', email: 'E-mail',
+    telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
+    youtube: 'YouTube', tiktok: 'TikTok', github: 'GitHub', linkedin: 'LinkedIn',
+  },
+  zh: {
+    settings: '设置', design: '设计', theme: '主题', language: '语言',
+    profile: '个人资料', links: '链接', auto: '自动', light: '浅色', dark: '深色',
+    namePlaceholder: '你的名字', bioPlaceholder: '简短介绍',
+    designs: ['粗野', '极光', '终端', '编辑', '霓虹'],
+    phone: '电话', email: '邮箱',
+    telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
+    youtube: 'YouTube', tiktok: 'TikTok', github: 'GitHub', linkedin: 'LinkedIn',
+  },
+  ja: {
+    settings: '設定', design: 'デザイン', theme: 'テーマ', language: '言語',
+    profile: 'プロフィール', links: 'リンク', auto: '自動', light: 'ライト', dark: 'ダーク',
+    namePlaceholder: '名前', bioPlaceholder: '自己紹介',
+    designs: ['ブルータル', 'オーロラ', 'ターミナル', 'エディトリアル', 'ネオン'],
+    phone: '電話', email: 'メール',
+    telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
+    youtube: 'YouTube', tiktok: 'TikTok', github: 'GitHub', linkedin: 'LinkedIn',
+  },
+  ko: {
+    settings: '설정', design: '디자인', theme: '테마', language: '언어',
+    profile: '프로필', links: '링크', auto: '자동', light: '라이트', dark: '다크',
+    namePlaceholder: '이름', bioPlaceholder: '소개',
+    designs: ['브루탈', '오로라', '터미널', '에디토리얼', '네온'],
+    phone: '전화', email: '이메일',
+    telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram',
+    youtube: 'YouTube', tiktok: 'TikTok', github: 'GitHub', linkedin: 'LinkedIn',
+  },
+  ar: {
+    settings: 'الإعدادات', design: 'التصميم', theme: 'السمة', language: 'اللغة',
+    profile: 'الملف الشخصي', links: 'الروابط', auto: 'تلقائي', light: 'فاتح', dark: 'داكن',
+    namePlaceholder: 'اسمك', bioPlaceholder: 'نبذة مختصرة',
+    designs: ['بروتال', 'أورورا', 'طرفية', 'تحريري', 'نيون'],
+    phone: 'الهاتف', email: 'البريد',
+    telegram: 'تيليجرام', whatsapp: 'واتساب', instagram: 'إنستغرام',
+    youtube: 'يوتيوب', tiktok: 'تيك توك', github: 'جيت هاب', linkedin: 'لينكد إن',
+  },
+};
+
+const LANG_NAMES = {
+  en: 'English', ru: 'Русский', es: 'Español', de: 'Deutsch',
+  fr: 'Français', pt: 'Português', zh: '中文', ja: '日本語', ko: '한국어', ar: 'العربية',
+};
+
+const RTL_LANGS = new Set(['ar']);
+
+// ============================================
+// 2. SVG ICONS
+// ============================================
+const ICONS = {
+  telegram: `<svg viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>`,
+  whatsapp: `<svg viewBox="0 0 24 24"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.28-.1-.48-.15-.68.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.52-.08-.15-.68-1.64-.93-2.25-.25-.59-.5-.51-.68-.52h-.58c-.2 0-.52.07-.8.38-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.22 5.1 4.51.71.31 1.27.49 1.7.63.72.23 1.37.2 1.88.12.58-.08 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35zm-5.42 7.4A9.87 9.87 0 0 1 7 20.15l-.36-.21-3.73.98.99-3.63-.24-.37a9.87 9.87 0 0 1-1.51-5.26c0-5.45 4.44-9.89 9.9-9.89a9.89 9.89 0 0 1 9.89 9.89c0 5.46-4.44 9.9-9.9 9.9zm8.41-18.3A11.82 11.82 0 0 0 12.05.03C5.49.03.13 5.39.13 11.96c0 2.11.55 4.17 1.6 5.99L.01 24l6.2-1.63a11.85 11.85 0 0 0 5.84 1.53c6.56 0 11.92-5.37 11.92-11.93a11.85 11.85 0 0 0-3.5-8.42z"/></svg>`,
+  instagram: `<svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85 0 3.2-.01 3.58-.07 4.85-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07-3.2 0-3.58-.01-4.85-.07-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.65-.07-4.85 0-3.2.01-3.58.07-4.85C2.38 3.86 3.9 2.31 7.15 2.23 8.42 2.17 8.8 2.16 12 2.16zM12 0C8.74 0 8.33.01 7.05.07 2.7.27.27 2.7.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.2-4.35-2.62-6.78-6.98-6.98C15.67.01 15.26 0 12 0zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.41-11.85a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88z"/></svg>`,
+  youtube: `<svg viewBox="0 0 24 24"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.55A3.02 3.02 0 0 0 .5 6.19 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.81 3.02 3.02 0 0 0 2.12 2.14c1.87.55 9.38.55 9.38.55s7.5 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.81zM9.55 15.57V8.43L15.82 12l-6.27 3.57z"/></svg>`,
+  tiktok: `<svg viewBox="0 0 24 24"><path d="M19.32 6.95A4.78 4.78 0 0 1 16.5 5.6V1h-3.75v14.37a2.88 2.88 0 0 1-2.87 2.63 2.88 2.88 0 0 1-2.88-2.88 2.88 2.88 0 0 1 2.88-2.87c.3 0 .6.05.87.13V7.5a6.63 6.63 0 0 0-.87-.06A6.63 6.63 0 0 0 3.25 14.1 6.63 6.63 0 0 0 9.88 20.7a6.63 6.63 0 0 0 6.62-6.63V8.65a8.52 8.52 0 0 0 4.98 1.6V6.5a4.8 4.8 0 0 1-2.16.45z"/></svg>`,
+  github: `<svg viewBox="0 0 24 24"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.11.82-.26.82-.58v-2.16c-3.34.73-4.04-1.42-4.04-1.42a3.18 3.18 0 0 0-1.33-1.75c-1.09-.74.08-.73.08-.73a2.52 2.52 0 0 1 1.84 1.24 2.56 2.56 0 0 0 3.49 1 2.55 2.55 0 0 1 .76-1.6c-2.67-.3-5.47-1.33-5.47-5.93a4.64 4.64 0 0 1 1.24-3.22 4.3 4.3 0 0 1 .12-3.18s1-.33 3.3 1.23a11.38 11.38 0 0 1 6 0c2.28-1.56 3.29-1.23 3.29-1.23a4.3 4.3 0 0 1 .12 3.18 4.64 4.64 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92a2.86 2.86 0 0 1 .82 2.22v3.29c0 .32.21.7.83.58A12 12 0 0 0 12 .3z"/></svg>`,
+  linkedin: `<svg viewBox="0 0 24 24"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.23 0H1.77A1.75 1.75 0 0 0 0 1.73v20.54A1.75 1.75 0 0 0 1.77 24h20.46A1.75 1.75 0 0 0 24 22.27V1.73A1.75 1.75 0 0 0 22.23 0z"/></svg>`,
+  phone: `<svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1v3.49a1 1 0 0 1-1 1A17 17 0 0 1 3 3a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2z"/></svg>`,
+  email: `<svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>`,
+};
+
+// ============================================
+// 3. STATE
+// ============================================
+const state = {
+  design: 1,
+  theme: 'auto',
+  lang: 'auto',
+  name: 'Alex Morgan',
+  bio: 'Creative Developer & Designer',
+  links: [
+    { id: 'telegram',  enabled: true,  url: 'https://t.me/username' },
+    { id: 'whatsapp',  enabled: true,  url: 'https://wa.me/1234567890' },
+    { id: 'instagram', enabled: true,  url: 'https://instagram.com/username' },
+    { id: 'youtube',   enabled: false, url: '' },
+    { id: 'tiktok',    enabled: false, url: '' },
+    { id: 'github',    enabled: true,  url: 'https://github.com/username' },
+    { id: 'linkedin',  enabled: false, url: '' },
+    { id: 'phone',     enabled: true,  url: 'tel:+1234567890' },
+    { id: 'email',     enabled: true,  url: 'mailto:hello@example.com' },
+  ],
+};
+
+// ============================================
+// 4. UTILITY FUNCTIONS
+// ============================================
+function detectLanguage() {
+  const nav = navigator.language || navigator.userLanguage || 'en';
+  const code = nav.split('-')[0].toLowerCase();
+  return T[code] ? code : 'en';
+}
+
+function getEffectiveLang() {
+  return state.lang === 'auto' ? detectLanguage() : state.lang;
+}
+
+function t(key) {
+  const lang = getEffectiveLang();
+  return (T[lang] && T[lang][key]) || T.en[key] || key;
+}
+
+function getEffectiveTheme() {
+  if (state.theme === 'auto') {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  return state.theme;
+}
+
+function getInitials(name) {
+  return name.split(/\s+/).map(w => w[0] || '').slice(0, 2).join('').toUpperCase() || '?';
+}
+
+// ============================================
+// 5. RENDERING
+// ============================================
+function applyDesign() {
+  const body = document.body;
+  body.className = `design-${state.design}`;
+  const theme = getEffectiveTheme();
+  if ((state.design === 1 || state.design === 4) && theme === 'dark') body.classList.add('dark');
+  if ((state.design === 2) && theme === 'light') body.classList.add('light');
+  if ((state.design === 3) && theme === 'light') body.classList.add('light');
+  if ((state.design === 5) && theme === 'light') body.classList.add('light');
+}
+
+function applyLanguage() {
+  const lang = getEffectiveLang();
+  const isRTL = RTL_LANGS.has(lang);
+  document.documentElement.lang = lang;
+  document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.dataset.i18n);
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    el.placeholder = t(el.dataset.i18nPlaceholder);
+  });
+}
+
+function renderProfile() {
+  document.getElementById('display-name').textContent = state.name || t('namePlaceholder');
+  document.getElementById('display-bio').textContent = state.bio || '';
+  document.getElementById('avatar').textContent = getInitials(state.name || '?');
+}
+
+function renderLinks() {
+  const container = document.getElementById('links-container');
+  container.innerHTML = '';
+  state.links.filter(l => l.enabled).forEach((link, i) => {
+    const a = document.createElement('a');
+    a.className = 'link-item';
+    a.href = link.url || '#';
+    a.target = link.id === 'phone' || link.id === 'email' ? '_self' : '_blank';
+    a.rel = 'noopener noreferrer';
+    a.style.animationDelay = `${i * 0.05}s`;
+    a.innerHTML = `
+      <span class="link-item-icon">${ICONS[link.id] || ''}</span>
+      <span class="link-item-label">${t(link.id)}</span>
+      <span class="link-item-arrow">\u2192</span>
+    `;
+    container.appendChild(a);
+  });
+}
+
+function renderDesignGrid() {
+  const grid = document.getElementById('design-grid');
+  const lang = getEffectiveLang();
+  const names = (T[lang] && T[lang].designs) || T.en.designs;
+  grid.innerHTML = '';
+  for (let i = 1; i <= 5; i++) {
+    const btn = document.createElement('button');
+    btn.className = `design-option${state.design === i ? ' active' : ''}`;
+    btn.dataset.design = i;
+    btn.innerHTML = `<span class="design-swatch design-swatch-${i}"></span><span>${names[i-1]}</span>`;
+    btn.addEventListener('click', () => { state.design = i; render(); });
+    grid.appendChild(btn);
+  }
+}
+
+function renderThemeBtns() {
+  const container = document.getElementById('theme-btns');
+  container.innerHTML = '';
+  ['auto', 'light', 'dark'].forEach(th => {
+    const btn = document.createElement('button');
+    btn.className = `theme-btn${state.theme === th ? ' active' : ''}`;
+    btn.textContent = t(th);
+    btn.addEventListener('click', () => { state.theme = th; render(); });
+    container.appendChild(btn);
+  });
+}
+
+function renderLangSelect() {
+  const sel = document.getElementById('lang-select');
+  sel.innerHTML = `<option value="auto">${t('auto')} (${LANG_NAMES[detectLanguage()]})</option>`;
+  Object.entries(LANG_NAMES).forEach(([code, name]) => {
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = name;
+    opt.selected = state.lang === code;
+    sel.appendChild(opt);
+  });
+}
+
+function renderLinksConfig() {
+  const container = document.getElementById('links-config');
+  container.innerHTML = '';
+  state.links.forEach((link, idx) => {
+    const div = document.createElement('div');
+    div.className = 'link-config-item';
+    div.innerHTML = `
+      <div class="link-config-row">
+        <label class="toggle">
+          <input type="checkbox" ${link.enabled ? 'checked' : ''} data-idx="${idx}">
+          <span class="toggle-track"></span>
+        </label>
+        <span class="link-config-icon">${ICONS[link.id] || ''}</span>
+        <span class="link-config-name">${t(link.id)}</span>
+      </div>
+      <input type="${link.id === 'email' ? 'email' : 'text'}"
+             class="link-url-input"
+             value="${link.url}"
+             placeholder="${link.id === 'phone' ? 'tel:+1234567890' : link.id === 'email' ? 'mailto:you@mail.com' : 'https://...'}"
+             data-idx="${idx}"
+             style="display:${link.enabled ? 'block' : 'none'}">
+    `;
+    const checkbox = div.querySelector('input[type="checkbox"]');
+    checkbox.addEventListener('change', (e) => {
+      state.links[idx].enabled = e.target.checked;
+      const urlInput = div.querySelector('.link-url-input');
+      urlInput.style.display = e.target.checked ? 'block' : 'none';
+      renderLinks();
+    });
+    const urlInput = div.querySelector('.link-url-input');
+    urlInput.addEventListener('input', (e) => {
+      state.links[idx].url = e.target.value;
+      renderLinks();
+    });
+    container.appendChild(div);
+  });
+}
+
+function render() {
+  applyDesign();
+  applyLanguage();
+  renderProfile();
+  renderLinks();
+  renderDesignGrid();
+  renderThemeBtns();
+  renderLangSelect();
+  renderLinksConfig();
+}
+
+// ============================================
+// 6. EVENT HANDLERS
+// ============================================
+function setupEvents() {
+  // Panel toggle
+  const settingsBtn = document.getElementById('settings-btn');
+  const panel = document.getElementById('config-panel');
+  const overlay = document.getElementById('overlay');
+  const closeBtn = document.getElementById('config-close');
+
+  function openPanel() {
+    panel.classList.add('open');
+    overlay.classList.add('open');
+    settingsBtn.classList.add('panel-open');
+  }
+  function closePanel() {
+    panel.classList.remove('open');
+    overlay.classList.remove('open');
+    settingsBtn.classList.remove('panel-open');
+  }
+
+  settingsBtn.addEventListener('click', openPanel);
+  closeBtn.addEventListener('click', closePanel);
+  overlay.addEventListener('click', closePanel);
+
+  // Profile inputs
+  document.getElementById('input-name').addEventListener('input', (e) => {
+    state.name = e.target.value;
+    renderProfile();
+  });
+  document.getElementById('input-bio').addEventListener('input', (e) => {
+    state.bio = e.target.value;
+    renderProfile();
+  });
+
+  // Language select
+  document.getElementById('lang-select').addEventListener('change', (e) => {
+    state.lang = e.target.value;
+    render();
+  });
+
+  // System theme change listener
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (state.theme === 'auto') render();
+  });
+}
+
+// ============================================
+// 7. INITIALIZATION
+// ============================================
+function init() {
+  // Set initial input values
+  document.getElementById('input-name').value = state.name;
+  document.getElementById('input-bio').value = state.bio;
+
+  setupEvents();
+  render();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
