@@ -1107,6 +1107,73 @@ body.design-5.light .link-item:not(.is-disabled):hover { border-color: rgba(0,18
 /* ============================================
    13. ANIMATIONS
    ============================================ */
+/* ============================================
+   13b. PARTICLE SYSTEM
+   ============================================ */
+.particles-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.p {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
+  color: var(--text-primary, #fff);
+  line-height: 1;
+  font-weight: 400;
+}
+
+/* Falling — money rain, matrix characters */
+.p-fall {
+  top: -30px;
+  opacity: 0;
+  animation: pFall var(--p-dur, 8s) linear infinite;
+}
+@keyframes pFall {
+  0% { transform: translateY(0) rotate(var(--p-r0, 0deg)); opacity: 0; }
+  4% { opacity: var(--p-op, 0.12); }
+  92% { opacity: var(--p-op, 0.12); }
+  100% { transform: translateY(110vh) rotate(var(--p-r1, 360deg)); opacity: 0; }
+}
+
+/* Floating — dreamy drift, gold dust */
+.p-float {
+  opacity: var(--p-op, 0.08);
+  animation: pFloat var(--p-dur, 14s) ease-in-out infinite;
+}
+@keyframes pFloat {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  25% { transform: translate(var(--p-dx, 12px), var(--p-dy, -18px)) rotate(90deg) scale(1.1); }
+  50% { transform: translate(calc(var(--p-dx, 12px) * -0.6), calc(var(--p-dy, -18px) * 1.8)) rotate(180deg) scale(0.9); }
+  75% { transform: translate(calc(var(--p-dx, 12px) * 0.8), calc(var(--p-dy, -18px) * 0.6)) rotate(270deg) scale(1.05); }
+}
+
+/* Rising — neon energy */
+.p-rise {
+  bottom: -20px;
+  opacity: 0;
+  animation: pRise var(--p-dur, 10s) linear infinite;
+}
+@keyframes pRise {
+  0% { transform: translateY(0) scale(0.4); opacity: 0; }
+  6% { opacity: var(--p-op, 0.1); }
+  50% { transform: translateY(-50vh) scale(1); }
+  94% { opacity: var(--p-op, 0.1); }
+  100% { transform: translateY(-110vh) scale(0.4); opacity: 0; }
+}
+
+/* Design-specific particle colors */
+body.design-1 .p { color: #000; }
+body.design-1.dark .p { color: #FFE600; }
+body.design-3 .p { color: #00ff41; text-shadow: 0 0 6px rgba(0,255,65,0.4); }
+body.design-3.light .p { color: #0a5f20; text-shadow: none; }
+body.design-4 .p { color: #c4935a; }
+body.design-5 .p { color: #00f0ff; text-shadow: 0 0 8px rgba(0,240,255,0.3); }
+
 @keyframes fadeSlideUp {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
@@ -1471,6 +1538,97 @@ function showToast(msg) {
 }
 
 // ============================================
+// 4b. PARTICLE SYSTEM
+// ============================================
+const DESIGN_PARTICLES = {
+  1: { // Brutalist — money rain
+    chars: ['$', '€', '£', '¥', '₿', '$', '$', '€'],
+    type: 'fall',
+    count: 16,
+    sizeRange: [14, 34],
+    durRange: [4, 9],
+    opacity: 0.08,
+  },
+  2: { // Aurora — floating geometry
+    chars: ['✦', '◇', '○', '△', '☆', '◈', '✧'],
+    type: 'float',
+    count: 12,
+    sizeRange: [8, 22],
+    durRange: [10, 22],
+    opacity: 0.07,
+  },
+  3: { // Terminal — matrix rain
+    chars: ['0', '1', '0', '1', '{', '}', '/', '>', '_', ';', '#', '&', '0', '1'],
+    type: 'fall',
+    count: 22,
+    sizeRange: [10, 16],
+    durRange: [2.5, 6],
+    opacity: 0.1,
+  },
+  4: { // Editorial — subtle gold dust
+    chars: ['✦', '·', '·', '·', '·', '✧', '·'],
+    type: 'float',
+    count: 10,
+    sizeRange: [3, 10],
+    durRange: [16, 30],
+    opacity: 0.2,
+  },
+  5: { // Neon — rising energy
+    chars: ['◆', '▲', '●', '■', '⬡', '◈', '▽'],
+    type: 'rise',
+    count: 14,
+    sizeRange: [5, 16],
+    durRange: [6, 13],
+    opacity: 0.08,
+  },
+};
+
+function renderParticles() {
+  const preview = document.getElementById('preview');
+  let layer = preview.querySelector('.particles-layer');
+  if (!layer) {
+    layer = document.createElement('div');
+    layer.className = 'particles-layer';
+    preview.insertBefore(layer, preview.firstChild);
+  }
+  layer.innerHTML = '';
+
+  const cfg = DESIGN_PARTICLES[state.design];
+  if (!cfg) return;
+
+  for (let i = 0; i < cfg.count; i++) {
+    const span = document.createElement('span');
+    span.className = `p p-${cfg.type}`;
+    span.textContent = cfg.chars[Math.floor(Math.random() * cfg.chars.length)];
+
+    const size = cfg.sizeRange[0] + Math.random() * (cfg.sizeRange[1] - cfg.sizeRange[0]);
+    const dur = cfg.durRange[0] + Math.random() * (cfg.durRange[1] - cfg.durRange[0]);
+    const left = 3 + Math.random() * 94;
+    const delay = Math.random() * dur;
+
+    let css = `left:${left}%;font-size:${size}px;--p-op:${cfg.opacity};--p-dur:${dur}s;animation-delay:-${delay.toFixed(1)}s;`;
+
+    if (cfg.type === 'fall') {
+      const r0 = Math.random() * 60 - 30;
+      const r1 = (Math.random() > 0.5 ? 1 : -1) * (180 + Math.random() * 540);
+      css += `--p-r0:${r0.toFixed(0)}deg;--p-r1:${r1.toFixed(0)}deg;`;
+    }
+    if (cfg.type === 'float') {
+      const top = 5 + Math.random() * 90;
+      const dx = (Math.random() - 0.5) * 50;
+      const dy = -8 - Math.random() * 35;
+      css += `top:${top}%;--p-dx:${dx.toFixed(0)}px;--p-dy:${dy.toFixed(0)}px;`;
+    }
+    if (cfg.type === 'rise') {
+      css += `left:${left}%;`;
+    }
+
+    span.style.cssText = css;
+    layer.appendChild(span);
+  }
+}
+
+// ============================================
 // 5. RENDERING
 // ============================================
 function applyDesign() {
@@ -1665,6 +1823,7 @@ function updateLinksConfigLabels() {
 
 function onDesignChange() {
   applyDesign();
+  renderParticles();
   renderLinks();
   renderContactForm();
   renderDesignGrid();
@@ -1692,6 +1851,7 @@ function onLangChange() {
 function render() {
   applyDesign();
   applyLanguage();
+  renderParticles();
   renderProfile();
   renderLinks();
   renderContactForm();
