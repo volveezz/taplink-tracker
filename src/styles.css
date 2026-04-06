@@ -32,8 +32,8 @@ input, select { font: inherit; color: inherit; }
    ============================================ */
 #settings-btn {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: calc(20px + env(safe-area-inset-top, 0px));
+  right: calc(20px + env(safe-area-inset-right, 0px));
   z-index: 1000;
   width: 48px;
   height: 48px;
@@ -81,6 +81,7 @@ input, select { font: inherit; color: inherit; }
   right: 0;
   width: 380px;
   height: 100vh;
+  height: 100dvh;
   background: rgba(12, 12, 18, 0.97);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -98,7 +99,7 @@ input, select { font: inherit; color: inherit; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 28px;
+  padding: calc(24px + env(safe-area-inset-top, 0px)) calc(28px + env(safe-area-inset-right, 0px)) 24px 28px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
   flex-shrink: 0;
 }
@@ -126,7 +127,7 @@ input, select { font: inherit; color: inherit; }
 .config-body {
   flex: 1;
   overflow-y: auto;
-  padding: 8px 0;
+  padding: 8px env(safe-area-inset-right, 0px) calc(8px + env(safe-area-inset-bottom, 0px)) 0;
 }
 .config-section {
   padding: 20px 28px;
@@ -392,7 +393,7 @@ input, select { font: inherit; color: inherit; }
   align-items: center;
   justify-content: center;
   overflow: hidden auto;
-  padding: 40px 20px;
+  padding: calc(40px + env(safe-area-inset-top, 0px)) calc(20px + env(safe-area-inset-right, 0px)) calc(20px + env(safe-area-inset-bottom, 0px)) calc(20px + env(safe-area-inset-left, 0px));
   transition: background 0.6s ease;
   position: relative;
   clip-path: inset(0);
@@ -672,7 +673,7 @@ input, select { font: inherit; color: inherit; }
 /* Toast notification */
 .toast {
   position: fixed;
-  bottom: 28px;
+  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%) translateY(16px);
   background: rgba(0,0,0,0.88);
@@ -1407,8 +1408,8 @@ body.design-10.light .link-item-icon { color: #006880; }
    ============================================ */
 @media (max-width: 768px) {
   #config-panel { width: 100%; }
-  #settings-btn { top: 14px; right: 14px; width: 42px; height: 42px; border-radius: 12px; }
-  #preview { padding: 24px 12px; }
+  #settings-btn { top: calc(14px + env(safe-area-inset-top, 0px)); right: calc(14px + env(safe-area-inset-right, 0px)); width: 42px; height: 42px; border-radius: 12px; }
+  #preview { padding: calc(24px + env(safe-area-inset-top, 0px)) calc(12px + env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) calc(12px + env(safe-area-inset-left, 0px)); }
   .preview-inner { padding: 36px 20px 32px; }
   body.design-4 .preview-inner { padding: 40px 24px 36px; }
   .profile-name { font-size: 22px !important; }
