@@ -390,7 +390,7 @@ input, select { font: inherit; color: inherit; }
 #preview {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   overflow: hidden auto;
   padding: calc(40px + env(safe-area-inset-top, 0px)) calc(20px + env(safe-area-inset-right, 0px)) calc(20px + env(safe-area-inset-bottom, 0px)) calc(20px + env(safe-area-inset-left, 0px));
@@ -403,6 +403,7 @@ input, select { font: inherit; color: inherit; }
   width: 100%;
   max-width: 420px;
   min-height: 500px;
+  margin: auto;
   position: relative;
   z-index: 1;
   padding: 48px 28px 40px;
