@@ -8,3 +8,5 @@ dist
 .codex/
 .mcp.json
 .preview*.log
+playwright-report
+test-results

@@ -1,0 +1,80 @@
+.landing-shell[data-design="editorial"] {
+  --font-heading: "Playfair Display", serif;
+  --font-body: "Cormorant Garamond", serif;
+  --text-primary: #1a1a1a;
+  --text-secondary: #7a6e60;
+  --accent: #c4935a;
+  --link-bg: transparent;
+  --link-text: #1a1a1a;
+  --link-radius: 0;
+  --avatar-size: 80px;
+  --shell-background: #f8f4ef;
+}
+
+.landing-shell[data-design="editorial"] .preview-inner {
+  padding: 56px 32px 48px;
+}
+
+.landing-shell[data-design="editorial"] .avatar {
+  background: transparent;
+  border: 1.5px solid #c4935a;
+  color: #c4935a;
+  font-style: italic;
+  font-size: 26px;
+}
+
+.landing-shell[data-design="editorial"] .profile-name {
+  font-size: 30px;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: -0.01em;
+}
+
+.landing-shell[data-design="editorial"] .profile-section {
+  margin-bottom: 24px;
+}
+
+.landing-shell[data-design="editorial"] .profile-section::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: #c4935a;
+  margin: 24px auto 0;
+}
+
+.landing-shell[data-design="editorial"] .links-section {
+  gap: 0;
+}
+
+.landing-shell[data-design="editorial"] .link-item {
+  padding: 18px 4px;
+  border-bottom: 1px solid rgba(180, 160, 130, 0.2);
+  border-radius: 0;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.landing-shell[data-design="editorial"] .contact-input {
+  border: none;
+  border-bottom: 1px solid rgba(180, 160, 130, 0.3);
+  border-radius: 0;
+  padding: 14px 4px;
+  background: transparent;
+}
+
+.landing-shell[data-design="editorial"] .contact-submit {
+  background: transparent;
+  color: #c4935a;
+  border: 1.5px solid #c4935a;
+  border-radius: 0;
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+}
+
+.landing-shell[data-design="editorial"][data-theme="dark"] {
+  --text-primary: #e8e0d4;
+  --text-secondary: #9a8e7e;
+  --link-text: #e8e0d4;
+  --shell-background: #1a1714;
+}

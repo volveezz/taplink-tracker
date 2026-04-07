@@ -1,0 +1,42 @@
+.landing-shell[data-design="hustle"] {
+  --font-heading: "Archivo Black", sans-serif;
+  --font-body: "Outfit", sans-serif;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666;
+  --accent: #2ecc71;
+  --link-bg: #f0faf4;
+  --link-text: #1a1a1a;
+  --link-border: 2px solid #2ecc71;
+  --link-radius: 14px;
+  --avatar-size: 88px;
+  --shell-background: #fff;
+}
+
+.landing-shell[data-design="hustle"] .avatar {
+  background: #2ecc71;
+  color: #fff;
+  font-family: "Archivo Black", sans-serif;
+}
+
+.landing-shell[data-design="hustle"] .profile-name {
+  text-transform: uppercase;
+  font-size: 26px;
+}
+
+.landing-shell[data-design="hustle"] .link-item:not(.is-disabled):hover {
+  background: #2ecc71;
+  color: #fff;
+  border-color: #2ecc71;
+}
+
+.landing-shell[data-design="hustle"] .contact-submit {
+  background: #2ecc71;
+}
+
+.landing-shell[data-design="hustle"][data-theme="dark"] {
+  --text-primary: #e0f0e8;
+  --text-secondary: #80a090;
+  --link-bg: rgba(46, 204, 113, 0.08);
+  --link-text: #e0f0e8;
+  --shell-background: #0e1a12;
+}

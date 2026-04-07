@@ -1,0 +1,62 @@
+.landing-shell[data-design="shadow"] {
+  --font-heading: "Rajdhani", sans-serif;
+  --font-body: "Rajdhani", sans-serif;
+  --text-primary: #d0d0d0;
+  --text-secondary: #707070;
+  --accent: #39ff14;
+  --link-bg: rgba(57, 255, 20, 0.04);
+  --link-text: #d0d0d0;
+  --link-border: 1px solid rgba(57, 255, 20, 0.15);
+  --link-radius: 6px;
+  --avatar-size: 82px;
+  --shell-background: #0c0c0c;
+}
+
+.landing-shell[data-design="shadow"] .avatar {
+  background: rgba(57, 255, 20, 0.08);
+  border: 1px solid rgba(57, 255, 20, 0.25);
+  color: #39ff14;
+  font-weight: 700;
+}
+
+.landing-shell[data-design="shadow"] .profile-name {
+  font-weight: 700;
+  font-size: 28px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.landing-shell[data-design="shadow"] .link-item {
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.landing-shell[data-design="shadow"] .link-item-icon {
+  color: #39ff14;
+}
+
+.landing-shell[data-design="shadow"] .link-item:not(.is-disabled):hover {
+  border-color: rgba(57, 255, 20, 0.5);
+  background: rgba(57, 255, 20, 0.08);
+}
+
+.landing-shell[data-design="shadow"] .contact-input {
+  background: rgba(57, 255, 20, 0.04);
+}
+
+.landing-shell[data-design="shadow"] .contact-submit {
+  background: #39ff14;
+  color: #000;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.landing-shell[data-design="shadow"][data-theme="light"] {
+  --text-primary: #1a1a1a;
+  --text-secondary: #555;
+  --accent: #1a8a10;
+  --link-bg: rgba(26, 138, 16, 0.05);
+  --link-text: #1a1a1a;
+  --link-border: 1px solid rgba(26, 138, 16, 0.2);
+  --shell-background: #f0f5f0;
+}

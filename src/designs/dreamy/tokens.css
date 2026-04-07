@@ -1,0 +1,42 @@
+.landing-shell[data-design="dreamy"] {
+  --font-heading: "Outfit", sans-serif;
+  --font-body: "Outfit", sans-serif;
+  --text-primary: #4a3a6a;
+  --text-secondary: #8a7aaa;
+  --accent: #b388ff;
+  --link-bg: rgba(179, 136, 255, 0.08);
+  --link-text: #4a3a6a;
+  --link-border: 1.5px solid rgba(179, 136, 255, 0.2);
+  --link-radius: 50px;
+  --avatar-size: 90px;
+  --shell-background: #f8f0ff;
+}
+
+.landing-shell[data-design="dreamy"] .avatar {
+  background: linear-gradient(135deg, #b388ff, #ff80ab);
+  color: #fff;
+  font-weight: 300;
+  font-size: 30px;
+}
+
+.landing-shell[data-design="dreamy"] .link-item:not(.is-disabled):hover {
+  background: rgba(179, 136, 255, 0.18);
+  border-color: rgba(179, 136, 255, 0.4);
+}
+
+.landing-shell[data-design="dreamy"] .contact-input,
+.landing-shell[data-design="dreamy"] .contact-submit {
+  border-radius: 50px;
+}
+
+.landing-shell[data-design="dreamy"] .contact-submit {
+  background: linear-gradient(135deg, #b388ff, #ff80ab);
+}
+
+.landing-shell[data-design="dreamy"][data-theme="dark"] {
+  --text-primary: #e0d0f0;
+  --text-secondary: #8a7a9a;
+  --link-bg: rgba(179, 136, 255, 0.06);
+  --link-text: #e0d0f0;
+  --shell-background: #1a1020;
+}

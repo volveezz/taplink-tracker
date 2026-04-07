@@ -1,0 +1,59 @@
+.landing-shell[data-design="aurora"] {
+  --font-heading: "Outfit", sans-serif;
+  --font-body: "Outfit", sans-serif;
+  --text-primary: #fff;
+  --text-secondary: rgba(255, 255, 255, 0.65);
+  --accent: #7c5bf5;
+  --link-bg: rgba(255, 255, 255, 0.07);
+  --link-text: #fff;
+  --link-border: 1px solid rgba(255, 255, 255, 0.1);
+  --link-radius: 16px;
+  --avatar-size: 92px;
+  --shell-background: #070720;
+}
+
+.landing-shell[data-design="aurora"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 40%, rgba(120, 50, 255, 0.35) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 80% at 75% 20%, rgba(0, 200, 190, 0.25) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 50% at 60% 85%, rgba(255, 50, 130, 0.2) 0%, transparent 70%);
+  animation: auroraShift 20s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+.landing-shell[data-design="aurora"] .avatar {
+  background: linear-gradient(135deg, rgba(120, 80, 255, 0.4), rgba(0, 200, 200, 0.3));
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-weight: 300;
+  font-size: 32px;
+}
+
+.landing-shell[data-design="aurora"] .link-item,
+.landing-shell[data-design="aurora"] .contact-input {
+  backdrop-filter: blur(16px);
+}
+
+.landing-shell[data-design="aurora"] .link-item:not(.is-disabled):hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(120, 80, 255, 0.15);
+}
+
+.landing-shell[data-design="aurora"] .contact-submit {
+  background: linear-gradient(135deg, #7c5bf5, #00c9c9);
+}
+
+.landing-shell[data-design="aurora"][data-theme="light"] {
+  --text-primary: #1a1030;
+  --text-secondary: #6b5e80;
+  --link-bg: rgba(255, 255, 255, 0.6);
+  --link-text: #1a1030;
+  --link-border: 1px solid rgba(100, 60, 200, 0.12);
+  --shell-background: #f0ecf8;
+}

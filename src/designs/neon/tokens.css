@@ -1,0 +1,80 @@
+.landing-shell[data-design="neon"] {
+  --font-heading: "Orbitron", sans-serif;
+  --font-body: "Rajdhani", sans-serif;
+  --text-primary: #ffffff;
+  --text-secondary: #7788aa;
+  --accent: #00f0ff;
+  --link-bg: rgba(0, 240, 255, 0.04);
+  --link-text: #e0f0ff;
+  --link-border: 1px solid rgba(0, 240, 255, 0.2);
+  --link-radius: 4px;
+  --avatar-size: 88px;
+  --shell-background: #06060f;
+}
+
+.landing-shell[data-design="neon"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  z-index: 0;
+}
+
+.landing-shell[data-design="neon"]::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(ellipse at 30% 50%, rgba(0, 240, 255, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 50%, rgba(255, 0, 255, 0.04) 0%, transparent 50%);
+  z-index: 0;
+  animation: neonDrift 12s ease-in-out infinite alternate;
+}
+
+.landing-shell[data-design="neon"] .avatar {
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  color: #00f0ff;
+  font-family: "Orbitron", sans-serif;
+  box-shadow:
+    0 0 20px rgba(0, 240, 255, 0.15),
+    inset 0 0 20px rgba(0, 240, 255, 0.05);
+}
+
+.landing-shell[data-design="neon"] .profile-name {
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  background: linear-gradient(90deg, #00f0ff, #ff00ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.landing-shell[data-design="neon"] .link-item:not(.is-disabled):hover {
+  border-color: rgba(0, 240, 255, 0.5);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+}
+
+.landing-shell[data-design="neon"] .contact-submit {
+  background: linear-gradient(90deg, rgba(0, 240, 255, 0.2), rgba(255, 0, 255, 0.2));
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  color: #00f0ff;
+  font-family: "Orbitron", sans-serif;
+  text-transform: uppercase;
+}
+
+.landing-shell[data-design="neon"][data-theme="light"] {
+  --text-primary: #0a0a20;
+  --text-secondary: #556688;
+  --link-bg: rgba(0, 180, 200, 0.06);
+  --link-text: #0a0a20;
+  --link-border: 1px solid rgba(0, 180, 200, 0.2);
+  --shell-background: #e8eaf0;
+}

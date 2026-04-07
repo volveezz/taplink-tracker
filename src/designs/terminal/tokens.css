@@ -1,0 +1,123 @@
+.landing-shell[data-design="terminal"] {
+  --font-heading: "VT323", monospace;
+  --font-body: "Fira Code", "VT323", monospace;
+  --text-primary: #00ff41;
+  --text-secondary: #00cc33;
+  --accent: #00ff41;
+  --link-bg: transparent;
+  --link-text: #00ff41;
+  --link-border: 1px solid rgba(0, 255, 65, 0.25);
+  --link-radius: 0;
+  --avatar-size: 0px;
+  --shell-background: #0a0a0a;
+}
+
+.landing-shell[data-design="terminal"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 2px,
+    rgba(0, 0, 0, 0.15) 4px
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.landing-shell[data-design="terminal"] .preview-inner {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 255, 65, 0.2);
+  padding: 0;
+}
+
+.landing-shell[data-design="terminal"] .terminal-bar,
+.landing-shell[data-design="terminal"] .terminal-cursor {
+  display: flex;
+}
+
+.landing-shell[data-design="terminal"] .terminal-bar {
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(0, 255, 65, 0.06);
+  border-bottom: 1px solid rgba(0, 255, 65, 0.15);
+  font-size: 14px;
+  color: #00ff41;
+}
+
+.landing-shell[data-design="terminal"] .terminal-cursor {
+  padding: 4px 20px 20px;
+  font-size: 18px;
+  color: #00ff41;
+}
+
+.landing-shell[data-design="terminal"] .terminal-cursor::after {
+  content: "█";
+  animation: blink 1s step-end infinite;
+}
+
+.landing-shell[data-design="terminal"] .profile-section {
+  text-align: left;
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+}
+
+.landing-shell[data-design="terminal"] .avatar {
+  display: none;
+}
+
+.landing-shell[data-design="terminal"] .profile-name::before {
+  content: "$ whoami → ";
+  opacity: 0.5;
+  font-size: 16px;
+}
+
+.landing-shell[data-design="terminal"] .profile-bio::before {
+  content: "# ";
+  opacity: 0.4;
+}
+
+.landing-shell[data-design="terminal"] .links-section {
+  padding: 16px 20px 24px;
+  gap: 4px;
+}
+
+.landing-shell[data-design="terminal"] .link-item {
+  padding: 10px 12px;
+  border: none;
+  border-left: 2px solid transparent;
+}
+
+.landing-shell[data-design="terminal"] .link-item:not(.is-disabled):hover {
+  background: rgba(0, 255, 65, 0.06);
+  border-left-color: #00ff41;
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
+}
+
+.landing-shell[data-design="terminal"] .contact-section {
+  padding: 0 20px 24px;
+}
+
+.landing-shell[data-design="terminal"] .contact-input {
+  background: transparent;
+  border: 1px solid rgba(0, 255, 65, 0.2);
+}
+
+.landing-shell[data-design="terminal"] .contact-submit {
+  background: transparent;
+  border: 1px solid #00ff41;
+  color: #00ff41;
+  font-family: "VT323", monospace;
+  font-size: 18px;
+}
+
+.landing-shell[data-design="terminal"][data-theme="light"] {
+  --text-primary: #0a5f20;
+  --text-secondary: #0a5f20;
+  --accent: #0a5f20;
+  --link-text: #0a5f20;
+  --shell-background: #f4f4f0;
+}

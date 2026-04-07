@@ -1,0 +1,91 @@
+.landing-shell[data-design="brutal"] {
+  --font-heading: "Archivo Black", sans-serif;
+  --font-body: "Space Mono", monospace;
+  --text-primary: #000;
+  --text-secondary: #333;
+  --accent: #ff2d6b;
+  --link-bg: #fff;
+  --link-text: #000;
+  --link-border: 3px solid #000;
+  --link-radius: 0px;
+  --link-shadow: 5px 5px 0 #000;
+  --avatar-size: 90px;
+  --shell-background: #ffe600;
+}
+
+.landing-shell[data-design="brutal"] .preview-inner {
+  padding: 48px 24px;
+}
+
+.landing-shell[data-design="brutal"] .avatar {
+  background: #ff2d6b;
+  color: #fff;
+  border: 3px solid #000;
+  box-shadow: 4px 4px 0 #000;
+  border-radius: 0;
+  font-family: "Archivo Black", sans-serif;
+}
+
+.landing-shell[data-design="brutal"] .profile-name {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 28px;
+}
+
+.landing-shell[data-design="brutal"] .profile-bio {
+  font-size: 13px;
+  letter-spacing: 0.01em;
+}
+
+.landing-shell[data-design="brutal"] .link-item:not(.is-disabled):hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 8px 8px 0 #000;
+}
+
+.landing-shell[data-design="brutal"] .link-item:not(.is-disabled):active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #000;
+}
+
+.landing-shell[data-design="brutal"] .link-item-label {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+}
+
+.landing-shell[data-design="brutal"] .links-section {
+  gap: 10px;
+}
+
+.landing-shell[data-design="brutal"] .contact-input {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.landing-shell[data-design="brutal"] .contact-submit {
+  background: #ff2d6b;
+  font-family: "Archivo Black", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 3px solid #000;
+  border-radius: 0;
+  box-shadow: 4px 4px 0 #000;
+}
+
+.landing-shell[data-design="brutal"] .contact-submit:hover {
+  box-shadow: 6px 6px 0 #000;
+  transform: translate(-2px, -2px);
+  filter: none;
+}
+
+.landing-shell[data-design="brutal"][data-theme="dark"] {
+  --text-primary: #ffe600;
+  --text-secondary: #ccc;
+  --link-bg: #1a1a1a;
+  --link-text: #ffe600;
+  --link-border: 3px solid #ffe600;
+  --link-shadow: 5px 5px 0 #ffe600;
+  --shell-background: #111;
+}

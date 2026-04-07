@@ -1,0 +1,52 @@
+.landing-shell[data-design="prestige"] {
+  --font-heading: "Cormorant Garamond", serif;
+  --font-body: "Cormorant Garamond", serif;
+  --text-primary: #2a2318;
+  --text-secondary: #8a7e6e;
+  --accent: #b8963e;
+  --link-bg: rgba(184, 150, 62, 0.05);
+  --link-text: #2a2318;
+  --link-border: 1px solid rgba(184, 150, 62, 0.18);
+  --link-radius: 8px;
+  --avatar-size: 82px;
+  --shell-background: #f5f0e8;
+}
+
+.landing-shell[data-design="prestige"] .avatar {
+  background: transparent;
+  border: 1.5px solid #b8963e;
+  color: #b8963e;
+  font-style: italic;
+  font-size: 26px;
+}
+
+.landing-shell[data-design="prestige"] .profile-name {
+  font-size: 30px;
+  font-weight: 600;
+}
+
+.landing-shell[data-design="prestige"] .profile-bio,
+.landing-shell[data-design="prestige"] .contact-input {
+  font-size: 17px;
+  font-weight: 300;
+}
+
+.landing-shell[data-design="prestige"] .link-item {
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.landing-shell[data-design="prestige"] .contact-submit {
+  background: #b8963e;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 17px;
+  letter-spacing: 0.04em;
+}
+
+.landing-shell[data-design="prestige"][data-theme="dark"] {
+  --text-primary: #e8e0d0;
+  --text-secondary: #8a806e;
+  --link-text: #e8e0d0;
+  --shell-background: #18150f;
+}

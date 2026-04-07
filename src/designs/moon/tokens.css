@@ -1,0 +1,52 @@
+.landing-shell[data-design="moon"] {
+  --font-heading: "Orbitron", sans-serif;
+  --font-body: "Rajdhani", sans-serif;
+  --text-primary: #e0e8ff;
+  --text-secondary: #6878a0;
+  --accent: #00d4ff;
+  --link-bg: rgba(0, 212, 255, 0.04);
+  --link-text: #e0e8ff;
+  --link-border: 1px solid rgba(0, 212, 255, 0.12);
+  --link-radius: 10px;
+  --avatar-size: 86px;
+  --shell-background: #060610;
+}
+
+.landing-shell[data-design="moon"] .avatar {
+  background: rgba(0, 212, 255, 0.06);
+  border: 1px solid rgba(0, 212, 255, 0.25);
+  color: #00d4ff;
+  font-family: "Orbitron", sans-serif;
+}
+
+.landing-shell[data-design="moon"] .profile-name {
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.landing-shell[data-design="moon"] .link-item {
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.landing-shell[data-design="moon"] .link-item-icon {
+  color: #00d4ff;
+}
+
+.landing-shell[data-design="moon"] .contact-submit {
+  background: linear-gradient(90deg, #00d4ff, #a855f7);
+  font-family: "Orbitron", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 13px;
+}
+
+.landing-shell[data-design="moon"][data-theme="light"] {
+  --text-primary: #0a0a20;
+  --text-secondary: #556688;
+  --link-bg: rgba(0, 180, 200, 0.04);
+  --link-text: #0a0a20;
+  --link-border: 1px solid rgba(0, 180, 200, 0.15);
+  --shell-background: #f0f4fa;
+}
