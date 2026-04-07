@@ -103,14 +103,17 @@ export function PreviewPage({
           </label>
         </fieldset>
         <fieldset className="preview-fieldset">
-          <legend className="mb-2 text-sm font-semibold text-white">Flag-backed JSON override</legend>
+          <legend className="mb-2 text-sm font-semibold text-white">
+            Flag-backed JSON override
+          </legend>
           <textarea
             className="preview-textarea"
             value={overrideJson}
             onChange={(event) => setOverrideJson(event.currentTarget.value)}
           />
           <p className="preview-help">
-            This preview only accepts the same payload shape used by PostHog UI/profile/contact flags.
+            This preview only accepts the same payload shape used by PostHog UI/profile/contact
+            flags.
           </p>
         </fieldset>
       </aside>
@@ -124,7 +127,7 @@ export function PreviewPage({
           onLinkClick={() => undefined}
           onDisabledClick={() => undefined}
           onContactStarted={() => undefined}
-          onContactSubmitted={() => undefined}
+          onContactSubmitted={() => Promise.resolve(true)}
         />
       </div>
     </div>

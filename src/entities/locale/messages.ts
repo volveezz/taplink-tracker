@@ -29,6 +29,10 @@ export const messages = {
     emailPlaceholder: "Your email",
     submit: "Send",
     thankYou: "Thank you!",
+    contactRequired: "Enter a phone number or email.",
+    invalidPhone: "Enter a valid phone number.",
+    invalidEmail: "Enter a valid email address.",
+    contactSendFailed: "Could not send this contact. Try again.",
     comingSoon: "Coming soon",
   },
   ru: {

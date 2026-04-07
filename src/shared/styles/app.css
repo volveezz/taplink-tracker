@@ -34,9 +34,7 @@ a {
   min-height: 100dvh;
   display: grid;
   place-items: center;
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 40%),
-    #060606;
+  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 40%), #060606;
 }
 
 .app-loading__pulse {
@@ -62,10 +60,8 @@ a {
   min-height: 100dvh;
   display: flex;
   justify-content: center;
-  padding: calc(32px + env(safe-area-inset-top, 0px))
-    calc(20px + env(safe-area-inset-right, 0px))
-    calc(20px + env(safe-area-inset-bottom, 0px))
-    calc(20px + env(safe-area-inset-left, 0px));
+  padding: calc(32px + env(safe-area-inset-top, 0px)) calc(20px + env(safe-area-inset-right, 0px))
+    calc(20px + env(safe-area-inset-bottom, 0px)) calc(20px + env(safe-area-inset-left, 0px));
 }
 
 .preview-inner {
@@ -279,6 +275,19 @@ a {
   border-color: var(--accent, rgba(255, 255, 255, 0.3));
 }
 
+.contact-input[aria-invalid="true"] {
+  border-color: #ff6b6b;
+}
+
+.contact-error {
+  margin: -4px 0 4px;
+  color: #ff8a8a;
+  font-family: var(--font-body, "Outfit");
+  font-size: 12px;
+  line-height: 1.35;
+  text-align: start;
+}
+
 .contact-submit {
   width: 100%;
   padding: 14px;
@@ -319,7 +328,6 @@ a {
   font-weight: 500;
   animation: fadeSlideUp 0.4s ease;
 }
-
 
 .terminal-bar,
 .terminal-cursor {
@@ -525,10 +533,8 @@ a {
 
 @media (max-width: 768px) {
   .landing-shell__content {
-    padding: calc(24px + env(safe-area-inset-top, 0px))
-      calc(12px + env(safe-area-inset-right, 0px))
-      calc(12px + env(safe-area-inset-bottom, 0px))
-      calc(12px + env(safe-area-inset-left, 0px));
+    padding: calc(24px + env(safe-area-inset-top, 0px)) calc(12px + env(safe-area-inset-right, 0px))
+      calc(12px + env(safe-area-inset-bottom, 0px)) calc(12px + env(safe-area-inset-left, 0px));
   }
 
   .preview-inner {

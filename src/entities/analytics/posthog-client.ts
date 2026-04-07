@@ -3,8 +3,12 @@ import type { FeaturePayload } from "@/entities/experiments/schemas";
 import type { BootstrapResponse } from "@/entities/experiments/schemas";
 
 let analyticsReady = false;
+let analyticsFallbackConfig: { apiKey: string; apiHost: string; distinctId: string } | null = null;
 
-export function captureAnalyticsEvent(eventName: string, properties: Record<string, unknown> = {}): void {
+export function captureAnalyticsEvent(
+  eventName: string,
+  properties: Record<string, unknown> = {},
+): void {
   if (!analyticsReady) return;
   posthog.capture(eventName, properties);
 }
@@ -12,6 +16,35 @@ export function captureAnalyticsEvent(eventName: string, properties: Record<stri
 export function registerAnalyticsContext(properties: Record<string, unknown>): void {
   if (!analyticsReady) return;
   posthog.register(properties);
+}
+
+export async function captureAnalyticsEventWithFallback(
+  eventName: string,
+  properties: Record<string, unknown> = {},
+): Promise<boolean> {
+  if (analyticsReady) {
+    posthog.capture(eventName, properties);
+    return true;
+  }
+
+  if (!analyticsFallbackConfig?.apiKey) return false;
+
+  try {
+    const captureUrl = new URL("/i/v0/e/", analyticsFallbackConfig.apiHost);
+    const response = await fetch(captureUrl, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        api_key: analyticsFallbackConfig.apiKey,
+        distinct_id: analyticsFallbackConfig.distinctId,
+        event: eventName,
+        properties,
+      }),
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
 }
 
 export function getRuntimeFeatureFlagValue(flagKey: string): unknown {
@@ -31,6 +64,12 @@ export function initAnalytics(
     onFlagsChanged: () => void;
   },
 ): void {
+  analyticsFallbackConfig = {
+    apiKey: bootstrap.analytics.apiKey,
+    apiHost: bootstrap.analytics.apiHost,
+    distinctId: bootstrap.distinctId,
+  };
+
   if (!bootstrap.analytics.apiKey) {
     callbacks.onLoaded();
     return;

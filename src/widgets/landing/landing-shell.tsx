@@ -4,7 +4,7 @@ import type { EffectiveTheme } from "@/entities/locale/locale";
 import type { ResolvedAppConfig } from "@/entities/experiments/schemas";
 import { ProfileCard } from "@/entities/profile/profile-card";
 import { LinkList } from "@/entities/links/link-list";
-import { ContactForm } from "@/features/contact-form/contact-form";
+import { ContactForm, type ContactSubmission } from "@/features/contact-form/contact-form";
 import { Toast } from "@/shared/ui/toast";
 
 export function LandingShell({
@@ -26,7 +26,7 @@ export function LandingShell({
   onLinkClick: (linkId: string, url: string, position: number) => void;
   onDisabledClick: (linkId: string, reason: string) => void;
   onContactStarted: () => void;
-  onContactSubmitted: (options: { phoneProvided: boolean; emailProvided: boolean }) => void;
+  onContactSubmitted: (submission: ContactSubmission) => Promise<boolean>;
 }) {
   const Ornaments = manifest.Ornaments;
 

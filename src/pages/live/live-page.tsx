@@ -5,8 +5,20 @@ import type {
   ResolvedAppConfig,
 } from "@/entities/experiments/schemas";
 import { mergeFeaturePayloads } from "@/entities/experiments/payload-merger";
-import { resolveLocale, resolveTheme, type EffectiveTheme, type ThemeMode } from "@/entities/locale/locale";
-import { captureAnalyticsEvent, getRuntimeFeatureFlagPayload, getRuntimeFeatureFlagValue, initAnalytics, registerAnalyticsContext } from "@/entities/analytics/posthog-client";
+import {
+  resolveLocale,
+  resolveTheme,
+  type EffectiveTheme,
+  type ThemeMode,
+} from "@/entities/locale/locale";
+import {
+  captureAnalyticsEvent,
+  captureAnalyticsEventWithFallback,
+  getRuntimeFeatureFlagPayload,
+  getRuntimeFeatureFlagValue,
+  initAnalytics,
+  registerAnalyticsContext,
+} from "@/entities/analytics/posthog-client";
 import { resolveDesignFromVariant } from "@/entities/experiments/assignment";
 import { loadDesignManifest } from "@/designs/registry";
 import type { DesignManifest } from "@/designs/types";
@@ -72,8 +84,12 @@ export function LivePage({ bootstrap, initialManifest }: LivePageProps) {
     syncAnalyticsContext();
     captureAnalyticsEvent("linkdrop_session_started", {
       entry_design: manifest.id,
-      visible_link_ids: config.links.filter((link) => link.state !== "hidden").map((link) => link.id),
-      active_link_ids: config.links.filter((link) => link.state === "active").map((link) => link.id),
+      visible_link_ids: config.links
+        .filter((link) => link.state !== "hidden")
+        .map((link) => link.id),
+      active_link_ids: config.links
+        .filter((link) => link.state === "active")
+        .map((link) => link.id),
       enabled_contact_fields: getEnabledContactFields(config),
     });
     if (bootstrap.experimentAssigned && !statsRef.current.featureViewSent) {
@@ -93,7 +109,9 @@ export function LivePage({ bootstrap, initialManifest }: LivePageProps) {
       startTransition(() => {
         setConfig((currentConfig) => {
           const nextConfig = mergeFeaturePayloads(payloads);
-          return JSON.stringify(nextConfig) === JSON.stringify(currentConfig) ? currentConfig : nextConfig;
+          return JSON.stringify(nextConfig) === JSON.stringify(currentConfig)
+            ? currentConfig
+            : nextConfig;
         });
       });
     }
@@ -130,8 +148,12 @@ export function LivePage({ bootstrap, initialManifest }: LivePageProps) {
       first_primary_action_ms: statsRef.current.firstPrimaryActionAt
         ? statsRef.current.firstPrimaryActionAt - statsRef.current.sessionStartedAt
         : null,
-      visible_link_ids: config.links.filter((link) => link.state !== "hidden").map((link) => link.id),
-      active_link_ids: config.links.filter((link) => link.state === "active").map((link) => link.id),
+      visible_link_ids: config.links
+        .filter((link) => link.state !== "hidden")
+        .map((link) => link.id),
+      active_link_ids: config.links
+        .filter((link) => link.state === "active")
+        .map((link) => link.id),
       enabled_contact_fields: getEnabledContactFields(config),
     });
   });
@@ -212,14 +234,25 @@ export function LivePage({ bootstrap, initialManifest }: LivePageProps) {
           enabled_contact_fields: getEnabledContactFields(config),
         });
       }}
-      onContactSubmitted={({ phoneProvided, emailProvided }) => {
-        statsRef.current.contactSubmitted = true;
-        notePrimaryAction("contact_submit");
-        captureAnalyticsEvent("linkdrop_contact_submitted", {
+      onContactSubmitted={async ({ phone, email, phoneProvided, emailProvided }) => {
+        const personProperties: Record<string, string> = {};
+        if (phone) personProperties.phone = phone;
+        if (email) personProperties.email = email;
+
+        const captured = await captureAnalyticsEventWithFallback("linkdrop_contact_submitted", {
           enabled_contact_fields: getEnabledContactFields(config),
+          phone,
+          email,
           phone_provided: phoneProvided,
           email_provided: emailProvided,
+          $set: personProperties,
         });
+
+        if (!captured) return false;
+
+        statsRef.current.contactSubmitted = true;
+        notePrimaryAction("contact_submit");
+        return true;
       }}
     />
   );
