@@ -4,7 +4,7 @@
   --text-primary: #2a2318;
   --text-secondary: #8a7e6e;
   --accent: #b8963e;
-  --link-bg: rgba(184, 150, 62, 0.05);
+  --link-bg: rgba(255, 252, 245, 0.86);
   --link-text: #2a2318;
   --link-border: 1px solid rgba(184, 150, 62, 0.18);
   --link-radius: 8px;
@@ -28,25 +28,31 @@
 .landing-shell[data-design="prestige"] .profile-bio,
 .landing-shell[data-design="prestige"] .contact-input {
   font-size: 17px;
-  font-weight: 300;
+  font-weight: 400;
 }
 
 .landing-shell[data-design="prestige"] .link-item {
   font-size: 17px;
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 0.02em;
+}
+
+.landing-shell[data-design="prestige"] .contact-title {
+  font-weight: 500;
 }
 
 .landing-shell[data-design="prestige"] .contact-submit {
   background: #b8963e;
   font-family: "Cormorant Garamond", serif;
   font-size: 17px;
+  font-weight: 600;
   letter-spacing: 0.04em;
 }
 
 .landing-shell[data-design="prestige"][data-theme="dark"] {
   --text-primary: #e8e0d0;
   --text-secondary: #8a806e;
+  --link-bg: rgba(38, 32, 22, 0.88);
   --link-text: #e8e0d0;
   --shell-background: #18150f;
 }

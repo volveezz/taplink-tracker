@@ -4,7 +4,7 @@
   --text-primary: #ffffff;
   --text-secondary: #7788aa;
   --accent: #00f0ff;
-  --link-bg: rgba(0, 240, 255, 0.04);
+  --link-bg: rgba(5, 14, 28, 0.88);
   --link-text: #e0f0ff;
   --link-border: 1px solid rgba(0, 240, 255, 0.2);
   --link-radius: 4px;
@@ -63,7 +63,9 @@
 }
 
 .landing-shell[data-design="neon"] .contact-submit {
-  background: linear-gradient(90deg, rgba(0, 240, 255, 0.2), rgba(255, 0, 255, 0.2));
+  background:
+    linear-gradient(90deg, rgba(0, 240, 255, 0.18), rgba(255, 0, 255, 0.16)),
+    rgba(5, 14, 28, 0.94);
   border: 1px solid rgba(0, 240, 255, 0.4);
   color: #00f0ff;
   font-family: "Orbitron", sans-serif;
@@ -73,7 +75,7 @@
 .landing-shell[data-design="neon"][data-theme="light"] {
   --text-primary: #0a0a20;
   --text-secondary: #556688;
-  --link-bg: rgba(0, 180, 200, 0.06);
+  --link-bg: rgba(248, 252, 255, 0.9);
   --link-text: #0a0a20;
   --link-border: 1px solid rgba(0, 180, 200, 0.2);
   --shell-background: #e8eaf0;

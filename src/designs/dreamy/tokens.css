@@ -4,7 +4,7 @@
   --text-primary: #4a3a6a;
   --text-secondary: #8a7aaa;
   --accent: #b388ff;
-  --link-bg: rgba(179, 136, 255, 0.08);
+  --link-bg: rgba(255, 250, 255, 0.82);
   --link-text: #4a3a6a;
   --link-border: 1.5px solid rgba(179, 136, 255, 0.2);
   --link-radius: 50px;
@@ -20,7 +20,7 @@
 }
 
 .landing-shell[data-design="dreamy"] .link-item:not(.is-disabled):hover {
-  background: rgba(179, 136, 255, 0.18);
+  background: rgba(255, 250, 255, 0.94);
   border-color: rgba(179, 136, 255, 0.4);
 }
 
@@ -36,7 +36,11 @@
 .landing-shell[data-design="dreamy"][data-theme="dark"] {
   --text-primary: #e0d0f0;
   --text-secondary: #8a7a9a;
-  --link-bg: rgba(179, 136, 255, 0.06);
+  --link-bg: rgba(42, 26, 56, 0.86);
   --link-text: #e0d0f0;
   --shell-background: #1a1020;
+}
+
+.landing-shell[data-design="dreamy"][data-theme="dark"] .link-item:not(.is-disabled):hover {
+  background: rgba(54, 34, 72, 0.92);
 }
