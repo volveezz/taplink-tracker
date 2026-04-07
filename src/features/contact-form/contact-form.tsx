@@ -60,6 +60,7 @@ export function ContactForm({
           onFocus={onContactStarted}
           onChange={(event) => setPhone(event.currentTarget.value)}
           autoComplete="tel"
+          data-protonpass-ignore="true"
         />
       ) : null}
       {showEmail ? (
@@ -74,6 +75,7 @@ export function ContactForm({
           onFocus={onContactStarted}
           onChange={(event) => setEmail(event.currentTarget.value)}
           autoComplete="email"
+          data-protonpass-ignore="true"
         />
       ) : null}
       {(showPhone || showEmail) && (

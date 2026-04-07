@@ -89,9 +89,14 @@ export function LivePage({ bootstrap, initialManifest }: LivePageProps) {
       getRuntimeFeatureFlagPayload(bootstrap.analytics.featureFlagKeys.contactOptionsExperiment),
     ].filter((payload): payload is FeaturePayload => Boolean(payload));
 
-    startTransition(() => {
-      setConfig(mergeFeaturePayloads(payloads));
-    });
+    if (payloads.length > 0 && !statsRef.current.contactStarted) {
+      startTransition(() => {
+        setConfig((currentConfig) => {
+          const nextConfig = mergeFeaturePayloads(payloads);
+          return JSON.stringify(nextConfig) === JSON.stringify(currentConfig) ? currentConfig : nextConfig;
+        });
+      });
+    }
 
     const runtimeVariant = getRuntimeFeatureFlagValue(bootstrap.analytics.designFlagKey);
     const runtimeDesignId = resolveDesignFromVariant(runtimeVariant);

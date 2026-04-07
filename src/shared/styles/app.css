@@ -237,7 +237,6 @@ a {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s backwards;
 }
 
 .contact-divider {
