@@ -1,0 +1,15 @@
+@font-face {
+  font-family: "Outfit";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2") format("woff2-variations");
+}
+
+@font-face {
+  font-family: "Archivo Black";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("@fontsource/archivo-black/files/archivo-black-latin-400-normal.woff2") format("woff2");
+}
